@@ -68,10 +68,41 @@ function Navigation() {
   )
 }
 
+function OpeningSection() {
+  const sectionRef = useRef<HTMLElement>(null)
+  const [visible, setVisible] = useState(false)
+
+  useEffect(() => {
+    const section = sectionRef.current
+    if (!section) return
+    const observer = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) {
+        setVisible(true)
+        observer.disconnect()
+      }
+    }, { threshold: 0.35 })
+    observer.observe(section)
+    return () => observer.disconnect()
+  }, [])
+
+  return (
+    <section ref={sectionRef} className="opening-section flex items-center" aria-labelledby="opening-title">
+      <div className="mx-auto w-full max-w-7xl px-8">
+        <h2 id="opening-title" className={`opening-title font-light ${visible ? 'animate-fade-rise' : 'opacity-0'}`}>
+          Najlepsi geodeci
+          <br />
+          w regionie
+        </h2>
+      </div>
+    </section>
+  )
+}
+
 export default function App() {
   const storyRef = useRef<HTMLElement>(null)
 
   return (
+    <>
     <main id="start" ref={storyRef} className="story-shell relative w-full bg-background">
       <div className="hero-shell sticky top-0 isolate w-full overflow-hidden bg-background">
       <a href="#hero-title" className="skip-link">Przejdź do treści</a>
@@ -139,5 +170,7 @@ export default function App() {
       <div className="story-progress absolute inset-x-0 bottom-0 z-20 h-[2px] origin-left bg-black/45" aria-hidden="true" />
       </div>
     </main>
+    <OpeningSection />
+    </>
   )
 }

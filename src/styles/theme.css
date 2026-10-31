@@ -129,6 +129,8 @@ a { text-decoration: none; }
 }
 .scroll-track-fill { height: calc(15% + var(--scroll-progress) * 500%); }
 .story-progress { transform: scaleX(var(--scroll-progress)); }
+.opening-section { position: relative; z-index: 1; margin-top: -1px; min-height: 100vh; min-height: 100svh; background: #151515; color: #e4e2d8; }
+.opening-title { margin: 0; font-size: clamp(40px, 8vw, 116px); line-height: 1.02; letter-spacing: -0.03em; }
 .mobile-toggle { display: none; }
 .skip-link { position: fixed; z-index: 100; top: 12px; left: 12px; transform: translateY(-160%); padding: 12px 20px; background: #000; color: #fff; border-radius: 30px; }
 .skip-link:focus { transform: translateY(0); }
