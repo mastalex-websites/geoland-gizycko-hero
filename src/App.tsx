@@ -9,12 +9,12 @@ const navigation = [
 ]
 
 const offers = [
-  { name: 'MAPY NUMERYCZNE', text: 'W naszej ofercie dotyczącej map numerycznych znajdują się mapy zasadnicze, mapy ewidencyjne, podziały gospodarcze, mapy sieci uzbrojenia podziemnego (energetyka, gaz, telekomunikacja) i inne.' },
-  { name: 'MAPY DO CELÓW PROJEKTOWYCH', text: 'Mapa do celów projektowych powstaje przez aktualizację mapy zasadniczej w obszarze planowanej inwestycji oraz, w razie konieczności, mapa taka uzupełniana jest o dodatkową treść, zgodnie z wymogami aktualnych przepisów prawa.' },
-  { name: 'POMIARY POWYKONAWCZE', text: 'Do zakończenia procesu budowlanego niezbędne jest zgłoszenie o zakończeniu budowy w nadzorze budowlanym. Do takiego zgłoszenia (oprócz wielu innych dokumentów) niezbędna jest geodezyjna mapa powykonawcza z klauzulą o przyjęciu do Państwowego Zasobu Geodezyjnego inwentaryzacji powykonawczej.' },
-  { name: 'TYCZENIA', text: 'Pomiary realizacyjne polegają na posadowieniu w terenie obiektów budowlanych zgodnie z planem zagospodarowania terenu sporządzonym przez projektanta.' },
-  { name: 'OKAZANIA GRANIC', text: 'Okazania przebiegu granic działek ewidencyjnych na gruncie w obecności stron zainteresowanych.' },
-  { name: 'PODZIAŁY NIERUCHOMOŚCI', text: 'Podziałem nieruchomości (gruntowej), zwyczajowo zwany podziałem działki jest to wyodrębnienie fragmentu pewnej powierzchni działki (nieruchomości). Tak wyodrębniona powierzchnia stanowić może odrębną nieruchomość (działkę) lub też, w następstwie innych prac geodezyjno - prawnych, może wejść w skład drugiej działki. Najczęściej dzielimy działki gdy chcemy odsprzedać, powiększyć inną, wydzielić jako działkę budowlaną, rolną pod uprawę itp.' },
+  { name: 'MAPY NUMERYCZNE', text: 'Mapy zasadnicze, ewidencyjne, podziały gospodarcze, mapy sieci uzbrojenia podziemnego (energetyka, gaz, telekomunikacja) i inne.' },
+  { name: 'MAPY DO CELÓW PROJEKTOWYCH', text: 'Aktualizacja mapy zasadniczej w obszarze planowanej inwestycji, w razie potrzeby uzupełniona zgodnie z aktualnymi przepisami.' },
+  { name: 'POMIARY POWYKONAWCZE', text: 'Geodezyjna mapa powykonawcza z klauzulą o przyjęciu do Państwowego Zasobu Geodezyjnego, niezbędna do zgłoszenia zakończenia budowy.' },
+  { name: 'TYCZENIA', text: 'Posadowienie obiektów budowlanych w terenie zgodnie z planem zagospodarowania terenu.' },
+  { name: 'OKAZANIA GRANIC', text: 'Okazanie przebiegu granic działek ewidencyjnych na gruncie, w obecności stron.' },
+  { name: 'PODZIAŁY NIERUCHOMOŚCI', text: 'Wydzielenie części działki jako odrębnej nieruchomości lub do włączenia w inną działkę, np. na sprzedaż, pod budowę lub uprawę.' },
 ]
 
 // Share of the viewport height each opening line travels; the gap between lines opens away from the centre.
