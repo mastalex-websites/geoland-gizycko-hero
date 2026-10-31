@@ -8,6 +8,20 @@ const navigation = [
   { label: 'Kontakt', href: 'mailto:marcinstemplewski@wp.pl' },
 ]
 
+const offers = [
+  { name: 'MAPY NUMERYCZNE', text: 'W naszej ofercie dotyczącej map numerycznych znajdują się mapy zasadnicze, mapy ewidencyjne, podziały gospodarcze, mapy sieci uzbrojenia podziemnego (energetyka, gaz, telekomunikacja) i inne.' },
+  { name: 'MAPY DO CELÓW PROJEKTOWYCH', text: 'Mapa do celów projektowych powstaje przez aktualizację mapy zasadniczej w obszarze planowanej inwestycji oraz, w razie konieczności, mapa taka uzupełniana jest o dodatkową treść, zgodnie z wymogami aktualnych przepisów prawa.' },
+  { name: 'POMIARY POWYKONAWCZE', text: 'Do zakończenia procesu budowlanego niezbędne jest zgłoszenie o zakończeniu budowy w nadzorze budowlanym. Do takiego zgłoszenia (oprócz wielu innych dokumentów) niezbędna jest geodezyjna mapa powykonawcza z klauzulą o przyjęciu do Państwowego Zasobu Geodezyjnego inwentaryzacji powykonawczej.' },
+  { name: 'TYCZENIA', text: 'Pomiary realizacyjne polegają na posadowieniu w terenie obiektów budowlanych zgodnie z planem zagospodarowania terenu sporządzonym przez projektanta.' },
+  { name: 'OKAZANIA GRANIC', text: 'Okazania przebiegu granic działek ewidencyjnych na gruncie w obecności stron zainteresowanych.' },
+  { name: 'PODZIAŁY NIERUCHOMOŚCI', text: 'Podziałem nieruchomości (gruntowej), zwyczajowo zwany podziałem działki jest to wyodrębnienie fragmentu pewnej powierzchni działki (nieruchomości). Tak wyodrębniona powierzchnia stanowić może odrębną nieruchomość (działkę) lub też, w następstwie innych prac geodezyjno - prawnych, może wejść w skład drugiej działki. Najczęściej dzielimy działki gdy chcemy odsprzedać, powiększyć inną, wydzielić jako działkę budowlaną, rolną pod uprawę itp.' },
+]
+
+// Share of the viewport height each opening line travels; the gap between lines opens away from the centre.
+const DRIFT_NEAR = 0.2
+const DRIFT_FAR = 0.36
+const DRIFT_EASING = 0.09
+
 function ArrowUpRight({ className = '' }: { className?: string }) {
   return <svg className={className} width="16" height="16" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M5 15 15 5M5 5h10v10" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" /></svg>
 }
@@ -91,13 +105,56 @@ function useReveal<T extends HTMLElement>() {
 function OpeningSection() {
   const { ref: sectionRef, revealClass } = useReveal<HTMLElement>()
 
+  useEffect(() => {
+    const section = sectionRef.current
+    if (!section || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+
+    const lines = [...section.querySelectorAll<HTMLElement>('[data-drift-line]')]
+    let animationFrame = 0
+    let drift = 0
+
+    // -1 when the section enters from below, 0 when it fills the viewport, 1 when it has left.
+    const getTarget = () => {
+      const { top, height } = section.getBoundingClientRect()
+      return Math.min(1, Math.max(-1, -top / height))
+    }
+    const render = () => {
+      lines.forEach((line, index) => {
+        const leading = (drift < 0) === (index === 0)
+        const shift = -drift * window.innerHeight * (leading ? DRIFT_NEAR : DRIFT_FAR)
+        line.style.transform = `translate3d(0, ${shift.toFixed(1)}px, 0)`
+      })
+    }
+    const tick = () => {
+      drift += (getTarget() - drift) * DRIFT_EASING
+      render()
+      animationFrame = requestAnimationFrame(tick)
+    }
+    const observer = new IntersectionObserver(([entry]) => {
+      cancelAnimationFrame(animationFrame)
+      if (entry.isIntersecting) animationFrame = requestAnimationFrame(tick)
+      else {
+        drift = getTarget()
+        render()
+      }
+    })
+
+    drift = getTarget()
+    render()
+    observer.observe(section)
+    return () => {
+      observer.disconnect()
+      cancelAnimationFrame(animationFrame)
+    }
+  }, [sectionRef])
+
   return (
     <section ref={sectionRef} className="opening-section flex items-center" aria-labelledby="opening-title">
       <div className="mx-auto w-full max-w-7xl px-8">
         <h2 id="opening-title" className={`opening-title font-light ${revealClass}`}>
-          Najlepsi geodeci
-          <br />
-          w regionie
+          <span data-drift-line className="opening-line">Najlepsi geodeci</span>
+          {' '}
+          <span data-drift-line className="opening-line">w regionie</span>
         </h2>
       </div>
     </section>
@@ -133,6 +190,33 @@ function AboutSection() {
           </p>
           <p className="about-signature font-mono">inż. Marcin Stemplewski</p>
         </AboutBlock>
+      </div>
+    </section>
+  )
+}
+
+function OfferRow({ number, name, text }: { number: string; name: string; text: string }) {
+  const { ref, revealClass } = useReveal<HTMLLIElement>()
+
+  return (
+    <li ref={ref} className={`offer-row ${revealClass}`}>
+      <span className="about-number font-mono" aria-hidden="true">{number}</span>
+      <h3 className="offer-name font-light">{name}</h3>
+      <p className="offer-text font-mono">{text}</p>
+    </li>
+  )
+}
+
+function OfferSection() {
+  return (
+    <section className="offer-section" aria-labelledby="offer-title">
+      <div className="mx-auto w-full max-w-7xl px-8">
+        <h2 id="offer-title" className="offer-title font-light">Oferta</h2>
+        <ol className="offer-list">
+          {offers.map((offer, index) => (
+            <OfferRow key={offer.name} number={`${String(index + 1).padStart(2, '0')}.`} name={offer.name} text={offer.text} />
+          ))}
+        </ol>
       </div>
     </section>
   )
@@ -212,6 +296,7 @@ export default function App() {
     </main>
     <OpeningSection />
     <AboutSection />
+    <OfferSection />
     </>
   )
 }

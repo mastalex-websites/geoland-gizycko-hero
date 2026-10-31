@@ -130,8 +130,9 @@ a { text-decoration: none; }
 }
 .scroll-track-fill { height: calc(15% + var(--scroll-progress) * 500%); }
 .story-progress { transform: scaleX(var(--scroll-progress)); }
-.opening-section { position: relative; z-index: 1; margin-top: -1px; min-height: 100vh; min-height: 100svh; background: #151515; color: #e4e2d8; }
+.opening-section { position: relative; z-index: 1; margin-top: -3px; min-height: 100vh; min-height: 100svh; overflow: clip; background: linear-gradient(to bottom, #000, #151515); color: #e4e2d8; }
 .opening-title { margin: 0; font-size: clamp(40px, 8vw, 116px); line-height: 1.02; letter-spacing: -0.03em; }
+.opening-line { display: block; will-change: transform; }
 .about-section { margin-top: -1px; padding-block: clamp(72px, 10vw, 140px) clamp(120px, 16vw, 240px); background: #151515; color: #e4e2d8; }
 .about-grid { display: flex; flex-direction: column; gap: clamp(72px, 9vw, 140px); }
 .about-block { display: flex; gap: 12px; max-width: 520px; }
@@ -140,6 +141,12 @@ a { text-decoration: none; }
 .about-heading { margin: 0; font-size: clamp(32px, 3.6vw, 48px); line-height: 1.1; letter-spacing: -0.02em; }
 .about-text { margin: 24px 0 0; font-size: 14px; line-height: 1.65; }
 .about-signature { margin: 24px 0 0; font-size: 14px; color: #9b9b9b; }
+.offer-section { margin-top: -1px; padding-bottom: clamp(120px, 16vw, 240px); background: #151515; color: #e4e2d8; }
+.offer-title { margin: 0 0 clamp(48px, 6vw, 96px); font-size: clamp(40px, 6vw, 84px); line-height: 1.02; letter-spacing: -0.03em; }
+.offer-list { margin: 0; padding: 0; list-style: none; border-bottom: 1px solid #424242; }
+.offer-row { display: grid; grid-template-columns: 56px minmax(0, 5fr) minmax(0, 6fr); gap: 24px; padding-block: clamp(28px, 3vw, 44px); border-top: 1px solid #424242; }
+.offer-name { margin: 0; font-size: clamp(22px, 2.6vw, 36px); line-height: 1.15; letter-spacing: -0.02em; }
+.offer-text { margin: 0; font-size: 14px; line-height: 1.65; }
 .mobile-toggle { display: none; }
 .skip-link { position: fixed; z-index: 100; top: 12px; left: 12px; transform: translateY(-160%); padding: 12px 20px; background: #000; color: #fff; border-radius: 30px; }
 .skip-link:focus { transform: translateY(0); }
@@ -159,6 +166,8 @@ a { text-decoration: none; }
 
 @media (max-width: 767px) {
   .about-block-offset { margin-left: 0; }
+  .offer-row { grid-template-columns: 32px minmax(0, 1fr); gap: 16px 12px; }
+  .offer-text { grid-column: 2; }
   .navigation-shell { min-height: 88px; padding: 22px 24px; }
   .desktop-navigation, .nav-cta { display: none; }
   .mobile-toggle { display: flex; }
