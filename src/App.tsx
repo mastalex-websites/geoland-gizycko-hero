@@ -78,8 +78,8 @@ export default function App() {
       <ScrollSequence containerRef={storyRef} />
       <Navigation />
 
-      <section className="hero-content relative z-10 flex flex-col items-center justify-center px-6 text-center" style={{ paddingTop: 'calc(8rem - 75px)' }} aria-labelledby="hero-title">
-        <div className="animate-fade-rise mb-7 flex items-center gap-3 text-[10px] font-medium tracking-[0.2em] text-muted uppercase sm:text-[11px]">
+      <section className="hero-content relative z-10 flex flex-col items-center justify-center px-6 text-center" aria-labelledby="hero-title">
+        <div className="animate-fade-rise mb-5 flex items-center gap-3 text-[10px] font-medium tracking-[0.2em] text-muted uppercase sm:text-[11px]">
           <span className="h-px w-7 bg-black/25" />
           Usługi geodezyjne · Giżycko
           <span className="h-px w-7 bg-black/25" />

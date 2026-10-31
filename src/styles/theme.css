@@ -70,6 +70,7 @@ a { text-decoration: none; }
   flex: 1 1 auto;
   min-height: 0;
   justify-content: flex-start;
+  padding-top: 16px;
   padding-bottom: clamp(20px, 5svh, 60px);
   opacity: clamp(0, calc(1 - var(--scroll-progress) * 3), 1);
   transform: translateY(calc(var(--scroll-progress) * -70px));
@@ -83,21 +84,9 @@ a { text-decoration: none; }
   background: url('/media/geoland-poster.jpg') center / cover no-repeat;
 }
 .sequence-wash {
-  background: linear-gradient(to bottom, #fff 0%, #ffffffd9 10%, #ffffff00 38%, #ffffff00 76%, #ffffff8c 90%, #fff 100%);
-}
-.sequence-wash::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(to bottom, #fff 0%, #fff 35%, #fffffffa 45%, #ffffffe0 56%, #ffffff99 64%, #ffffff26 78%, #ffffff00 87%, #fff 100%);
-  opacity: clamp(0, calc(1 - var(--scroll-progress) * 1.8), 1);
-}
-.sequence-wash::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(to right, #fffffff5 0%, #ffffffb3 24%, #ffffff00 62%);
-  opacity: clamp(0, calc((var(--scroll-progress) - 0.55) * 4), 1);
+  bottom: auto;
+  height: 176px;
+  background: linear-gradient(to bottom, #fff 0%, #fffffff5 42%, #ffffffb3 70%, #ffffff00 100%);
 }
 .story-outro {
   left: max(32px, calc((100vw - 1216px) / 2));
@@ -122,14 +111,6 @@ a { text-decoration: none; }
   .hero-description { font-size: clamp(14px, 1.9svh, 18px); }
 }
 
-@media (min-width: 1280px) {
-  .hero-content { padding-top: calc(8rem - 75px); }
-}
-
-@media (min-height: 900px) and (min-width: 768px) {
-  .hero-content { padding-top: 80px !important; }
-}
-
 @media (max-width: 1023px) {
   .desktop-navigation { gap: 24px; }
   .nav-cta { gap: 12px; padding-inline: 20px; }
@@ -142,22 +123,21 @@ a { text-decoration: none; }
   .navigation-shell { min-height: 88px; padding: 22px 24px; }
   .desktop-navigation, .nav-cta { display: none; }
   .mobile-toggle { display: flex; }
-  .hero-content { padding-top: 48px !important; padding-bottom: 80px; }
+  .hero-content { padding-top: 16px; padding-bottom: 80px; }
   .hero-title { font-size: clamp(48px, 7.8vw, 72px); letter-spacing: -1.7px; line-height: 1.02; }
   .hero-description { max-width: 520px; }
   .hero-cta { gap: 20px; margin-top: 32px; padding: 19px 30px; font-size: 14px; }
   .hero-bottom { padding-inline: 24px; padding-bottom: 24px; }
   .story-outro { left: 24px; right: 24px; top: 48%; }
-  .sequence-wash::before { background: linear-gradient(to right, #fffffff5, #ffffffe6 78%, #ffffff60); }
 }
 
 @media (max-width: 479px) {
-  .hero-content { padding-inline: 22px; padding-top: 38px !important; padding-bottom: 60px; }
+  .hero-content { padding-inline: 22px; padding-top: 14px; padding-bottom: 60px; }
   .hero-title { max-width: 390px; font-size: clamp(48px, 11.6vw, 55px); line-height: 1.02; }
   .headline-break { display: none; }
   .hero-description { font-size: 14px; line-height: 1.8; margin-top: 24px; }
   .hero-cta { padding-inline: 28px; }
-  .hero-content > div:first-child { margin-bottom: 24px; font-size: 9px; letter-spacing: 0.15em; gap: 10px; }
+  .hero-content > div:first-child { margin-bottom: 20px; font-size: 9px; letter-spacing: 0.15em; gap: 10px; }
   .hero-bottom { gap: 16px; align-items: center; }
   .address-link { gap: 9px; }
   .address-link > span:last-child { font-size: 9px; }
@@ -171,7 +151,7 @@ a { text-decoration: none; }
 
 @media (max-height: 780px) {
   .navigation-shell { min-height: 82px; padding-block: 19px; }
-  .hero-content { padding-top: 28px !important; padding-bottom: 50px; }
+  .hero-content { padding-top: 12px; padding-bottom: 50px; }
   .hero-content > div:first-child { margin-bottom: 20px; }
   .hero-description { margin-top: 24px; }
   .hero-cta { margin-top: 28px; padding-block: 17px; }
@@ -181,7 +161,7 @@ a { text-decoration: none; }
 }
 
 @media (max-height: 700px) and (max-width: 479px) {
-  .hero-content { padding-top: 20px !important; padding-bottom: 32px; }
+  .hero-content { padding-top: 10px; padding-bottom: 32px; }
   .hero-title { font-size: 44px; }
   .hero-description { font-size: 12px; margin-top: 20px; }
   .hero-content > p:last-child { display: none; }
@@ -190,7 +170,7 @@ a { text-decoration: none; }
 
 @media (max-height: 500px) and (orientation: landscape) {
   .navigation-shell { min-height: 64px; padding-block: 12px; }
-  .hero-content { padding-top: 6px !important; padding-bottom: 10px; }
+  .hero-content { padding-top: 6px; padding-bottom: 10px; }
   .hero-content > div:first-child, .hero-content > p:last-child, .scroll-cue { display: none; }
   .hero-title { font-size: 44px; }
   .hero-description { margin-top: 12px; font-size: 12px; max-width: 550px; }
