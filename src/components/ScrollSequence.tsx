@@ -7,7 +7,7 @@ const CONCURRENT_LOADS = 4
 // The lens begins filling the frame at 8 s; clear the mist before entering it.
 const LENS_ENTRY_START = 192
 const LENS_ENTRY_END = 204
-const frameUrl = (index: number) => `/media/frames/frame-${String(index).padStart(4, '0')}.webp`
+const frameUrl = (index: number) => `${import.meta.env.BASE_URL}media/frames/frame-${String(index).padStart(4, '0')}.webp`
 
 export default function ScrollSequence({ containerRef }: { containerRef: RefObject<HTMLElement | null> }) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
