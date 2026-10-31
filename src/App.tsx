@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, type ReactNode } from 'react'
 import ScrollSequence from './components/ScrollSequence'
 
 const navigation = [
@@ -68,31 +68,71 @@ function Navigation() {
   )
 }
 
-function OpeningSection() {
-  const sectionRef = useRef<HTMLElement>(null)
+function useReveal<T extends HTMLElement>() {
+  const ref = useRef<T>(null)
   const [visible, setVisible] = useState(false)
 
   useEffect(() => {
-    const section = sectionRef.current
-    if (!section) return
+    const element = ref.current
+    if (!element) return
     const observer = new IntersectionObserver(([entry]) => {
       if (entry.isIntersecting) {
         setVisible(true)
         observer.disconnect()
       }
     }, { threshold: 0.35 })
-    observer.observe(section)
+    observer.observe(element)
     return () => observer.disconnect()
   }, [])
+
+  return { ref, revealClass: visible ? 'animate-fade-rise' : 'opacity-0' }
+}
+
+function OpeningSection() {
+  const { ref: sectionRef, revealClass } = useReveal<HTMLElement>()
 
   return (
     <section ref={sectionRef} className="opening-section flex items-center" aria-labelledby="opening-title">
       <div className="mx-auto w-full max-w-7xl px-8">
-        <h2 id="opening-title" className={`opening-title font-light ${visible ? 'animate-fade-rise' : 'opacity-0'}`}>
+        <h2 id="opening-title" className={`opening-title font-light ${revealClass}`}>
           Najlepsi geodeci
           <br />
           w regionie
         </h2>
+      </div>
+    </section>
+  )
+}
+
+function AboutBlock({ number, title, className = '', children }: { number: string; title: string; className?: string; children: ReactNode }) {
+  const { ref, revealClass } = useReveal<HTMLDivElement>()
+
+  return (
+    <div ref={ref} className={`about-block ${className} ${revealClass}`}>
+      <span className="about-number font-mono" aria-hidden="true">{number}</span>
+      <div>
+        <h3 className="about-heading font-light">{title}</h3>
+        {children}
+      </div>
+    </div>
+  )
+}
+
+function AboutSection() {
+  return (
+    <section className="about-section" aria-label="O firmie">
+      <div className="about-grid mx-auto w-full max-w-7xl px-8">
+        <AboutBlock number="01." title="Kompleksowe usługi">
+          <p className="about-text font-mono">
+            Geoland-Giżycko jest małą firmą geodezyjną oferującą kompleksowe usługi z zakresu pomiarów powykonawczych, map do celów projektowych i podziałów nieruchomości. Wiedza oraz wieloletnie doświadczenie zdobyte podczas realizacji zleceń geodezyjnych na terenie całego kraju, pozwalają nam na wykonanie usług na najwyższym poziomie.
+          </p>
+        </AboutBlock>
+        <AboutBlock number="02." title="Sprzęt i oprogramowanie" className="about-block-offset">
+          <p className="about-text font-mono">
+            Dysponujemy profesjonalnym sprzętem pomiarowym oraz najnowszym oprogramowaniem geo-informatycznym co pozwala nam na wykonywanie usług na najwyższym poziomie. Gwarantujemy naszym klientom satysfakcję oraz zadowolenie z powierzonych nam prac.
+          </p>
+          <p className="about-signature font-mono">inż. Marcin Stemplewski</p>
+        </AboutBlock>
       </div>
     </section>
   )
@@ -171,6 +211,7 @@ export default function App() {
       </div>
     </main>
     <OpeningSection />
+    <AboutSection />
     </>
   )
 }
