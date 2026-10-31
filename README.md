@@ -29,7 +29,8 @@ i bez aktualizowania React przy każdym scrollu. Wczytywane są cztery obrazy
 naraz; pamięć przechowuje maksymalnie 24 zdekodowane klatki. Przy szybkim
 przewijaniu do czasu załadowania właściwej klatki wyświetla się najbliższa.
 Obsługiwane są zmiany rozmiaru okna, odwracanie scrolla i preferencja
-ograniczenia ruchu (statyczne hero bez wydłużonego przewijania).
+ograniczenia ruchu. W tym trybie przewijanie nadal działa, a scena przełącza
+się pomiędzy 13 statycznymi ujęciami zamiast płynnego przybliżenia.
 
 Biała mgła jest ograniczona do górnych 176 px. Zaczyna znikać przy klatce
 192 i jest całkowicie niewidoczna od klatki 204, gdy kamera wchodzi
@@ -50,3 +51,10 @@ buduje i publikuje stronę po pushu na `main`. GitHub Pages korzysta
 z GitHub Actions. Nazwa repozytorium ustawia ścieżkę `VITE_BASE_PATH`,
 uwzględnianą w adresach klatek i pozostałych zasobów.
 Lokalnie aplikację uruchamia się przez `npm run dev` pod `/`.
+
+## Sprawdzenie regresji przewijania
+
+Po `npm run dev` otwórz `/tests/reduced-motion.html`. Ten lokalny test
+uruchamia prawdziwą aplikację z jej stylami ograniczonego ruchu, bez zmiany
+ustawień systemu. Klawisz End ma przewinąć stronę i pokazać ostatnią klatkę
+(239), a Home ma wrócić do klatki 0. Fixture nie jest częścią buildu strony.

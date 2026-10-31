@@ -33,8 +33,9 @@ a { text-decoration: none; }
 ::selection { background: #dedfd4; color: #000; }
 :focus-visible { outline: 2px solid #000; outline-offset: 6px; }
 
-.story-shell { height: 360svh; --scroll-progress: 0; }
+.story-shell { height: 360vh; height: 360svh; --scroll-progress: 0; }
 .hero-shell {
+  height: 100vh;
   height: 100svh;
   min-height: 0;
   display: flex;
@@ -183,8 +184,5 @@ a { text-decoration: none; }
   :root { scroll-behavior: auto; }
   *, *::before, *::after { animation: none !important; transition: none !important; }
   .button-dark:hover, .button-dark:active { transform: none; }
-  .story-shell { height: auto; }
-  .hero-shell { position: relative; height: auto; min-height: 100svh; }
-  .hero-content { flex: 1 0 auto; opacity: 1; transform: none; }
-  .story-outro, .scroll-cue, .story-progress { display: none; }
+  .hero-content, .story-outro { transform: none; will-change: auto; }
 }

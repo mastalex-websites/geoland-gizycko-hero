@@ -4,6 +4,7 @@ import type { RefObject } from 'react'
 const FRAME_COUNT = 240
 const CACHE_LIMIT = 24
 const CONCURRENT_LOADS = 4
+const REDUCED_MOTION_STEPS = 12
 // The lens begins filling the frame at 8 s; clear the mist before entering it.
 const LENS_ENTRY_START = 192
 const LENS_ENTRY_END = 204
@@ -98,8 +99,18 @@ export default function ScrollSequence({ containerRef }: { containerRef: RefObje
       const nextQueue = [target]
       // Load the requested frame first, then a small window in both directions.
       // This bounds decoded memory instead of retaining all 240 images.
-      for (let offset = 1; offset <= (preference.matches ? 0 : 10); offset += 1) {
-        nextQueue.push(target + offset * direction, target - offset * direction)
+      if (preference.matches) {
+        const step = Math.round(target / (FRAME_COUNT - 1) * REDUCED_MOTION_STEPS)
+        for (let offset = 1; offset <= 2; offset += 1) {
+          nextQueue.push(
+            Math.round((step + offset * direction) / REDUCED_MOTION_STEPS * (FRAME_COUNT - 1)),
+            Math.round((step - offset * direction) / REDUCED_MOTION_STEPS * (FRAME_COUNT - 1)),
+          )
+        }
+      } else {
+        for (let offset = 1; offset <= 10; offset += 1) {
+          nextQueue.push(target + offset * direction, target - offset * direction)
+        }
       }
       queue = nextQueue.filter((index) => index >= 0 && index < FRAME_COUNT)
       lastTarget = target
@@ -111,8 +122,11 @@ export default function ScrollSequence({ containerRef }: { containerRef: RefObje
       if (disposed) return
       const rect = container.getBoundingClientRect()
       const distance = Math.max(1, container.offsetHeight - window.innerHeight)
-      const progress = preference.matches ? 0 : Math.max(0, Math.min(1, -rect.top / distance))
-      const nextTarget = Math.round(progress * (FRAME_COUNT - 1))
+      const progress = Math.max(0, Math.min(1, -rect.top / distance))
+      const frameProgress = preference.matches
+        ? Math.round(progress * REDUCED_MOTION_STEPS) / REDUCED_MOTION_STEPS
+        : progress
+      const nextTarget = Math.round(frameProgress * (FRAME_COUNT - 1))
       container.style.setProperty('--scroll-progress', String(progress))
       if (heroContent) heroContent.inert = progress > 0.34
       canvas.dataset.progress = progress.toFixed(4)

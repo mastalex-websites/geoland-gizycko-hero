@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="pl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Scroll regression — reduced motion</title>
+    <script>
+      // Exercise the real application and its real reduced-motion CSS together.
+      const nativeMatchMedia = window.matchMedia.bind(window)
+      const reduceQuery = '(prefers-reduced-motion: reduce)'
+      document.documentElement.dataset.motionFixture = 'reduce'
+      window.matchMedia = (query) => query === reduceQuery
+        ? { matches: true, media: query, onchange: null, addEventListener() {}, removeEventListener() {}, addListener() {}, removeListener() {}, dispatchEvent() { return true } }
+        : nativeMatchMedia(query)
+
+      const forceReducedStyles = () => {
+        const visit = (rules) => {
+          for (const rule of rules) {
+            if (rule.media?.mediaText === reduceQuery) rule.media.mediaText = 'all'
+            if (rule.cssRules) visit(rule.cssRules)
+          }
+        }
+        for (const sheet of document.styleSheets) {
+          try { visit(sheet.cssRules) } catch { /* External font styles are cross-origin. */ }
+        }
+      }
+      new MutationObserver(forceReducedStyles).observe(document.head, { childList: true, subtree: true, characterData: true })
+      document.addEventListener('DOMContentLoaded', forceReducedStyles)
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
