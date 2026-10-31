@@ -39,11 +39,14 @@ więc działa również przy cofaniu scrolla i doczytywaniu obrazów.
 Fonty Instrument Serif oraz Inter importowane są w `src/styles/fonts.css`;
 animacje i przejścia sceny znajdują się w `src/styles/theme.css`.
 
-## Prywatne repozytorium
+## GitHub Pages
 
 Kod: https://github.com/mastalex-websites/geoland-gizycko-hero
 
-Repozytorium jest prywatne. GitHub Pages i automatyczne publikowanie
-są wyłączone. Stronę uruchamia się lokalnie przez `npm run dev`.
-Opcjonalna zmienna `VITE_BASE_PATH` pozwala budować projekt pod inną
-ścieżką; bez niej aplikacja działa pod `/`.
+Strona: https://mastalex-websites.github.io/geoland-gizycko-hero/
+
+Repozytorium jest publiczne. Workflow `.github/workflows/deploy-pages.yml`
+buduje i publikuje stronę po pushu na `main`. GitHub Pages korzysta
+z GitHub Actions. Nazwa repozytorium ustawia ścieżkę `VITE_BASE_PATH`,
+uwzględnianą w adresach klatek i pozostałych zasobów.
+Lokalnie aplikację uruchamia się przez `npm run dev` pod `/`.
