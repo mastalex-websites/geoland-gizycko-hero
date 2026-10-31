@@ -21,6 +21,10 @@ const offers = [
 const DRIFT_NEAR = 0.2
 const DRIFT_FAR = 0.36
 const DRIFT_EASING = 0.09
+// Blocks below the opening: travel per viewport height, and the distances from centre where they start and finish fading.
+const BLOCK_DRIFT = 0.12
+const BLOCK_FADE_START = 0.35
+const BLOCK_FADE_END = 0.6
 
 function ArrowUpRight({ className = '' }: { className?: string }) {
   return <svg className={className} width="16" height="16" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M5 15 15 5M5 5h10v10" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" /></svg>
@@ -102,56 +106,77 @@ function useReveal<T extends HTMLElement>() {
   return { ref, revealClass: visible ? 'animate-fade-rise' : 'opacity-0' }
 }
 
-function OpeningSection() {
-  const { ref: sectionRef, revealClass } = useReveal<HTMLElement>()
+function useEasedScroll<T extends HTMLElement>(getTarget: (element: T, value: number) => number, render: (element: T, value: number) => void) {
+  const ref = useRef<T>(null)
 
   useEffect(() => {
-    const section = sectionRef.current
-    if (!section || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+    const element = ref.current
+    if (!element || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
 
-    const lines = [...section.querySelectorAll<HTMLElement>('[data-drift-line]')]
     let animationFrame = 0
-    let drift = 0
-
-    // -1 when the section enters from below, 0 when it fills the viewport, 1 when it has left.
-    const getTarget = () => {
-      const { top, height } = section.getBoundingClientRect()
-      return Math.min(1, Math.max(-1, -top / height))
-    }
-    const render = () => {
-      lines.forEach((line, index) => {
-        const leading = (drift < 0) === (index === 0)
-        const shift = -drift * window.innerHeight * (leading ? DRIFT_NEAR : DRIFT_FAR)
-        line.style.transform = `translate3d(0, ${shift.toFixed(1)}px, 0)`
-      })
-    }
+    let value = getTarget(element, 0)
     const tick = () => {
-      drift += (getTarget() - drift) * DRIFT_EASING
-      render()
+      value += (getTarget(element, value) - value) * DRIFT_EASING
+      render(element, value)
       animationFrame = requestAnimationFrame(tick)
     }
     const observer = new IntersectionObserver(([entry]) => {
       cancelAnimationFrame(animationFrame)
       if (entry.isIntersecting) animationFrame = requestAnimationFrame(tick)
       else {
-        drift = getTarget()
-        render()
+        value = getTarget(element, value)
+        render(element, value)
       }
-    })
+    }, { rootMargin: '30% 0px' })
 
-    drift = getTarget()
-    render()
-    observer.observe(section)
+    render(element, value)
+    observer.observe(element)
     return () => {
       observer.disconnect()
       cancelAnimationFrame(animationFrame)
     }
-  }, [sectionRef])
+  }, [getTarget, render])
+
+  return ref
+}
+
+const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value))
+
+// -1 when the section enters from below, 0 when it fills the viewport, 1 when it has left.
+function getOpeningDrift(section: HTMLElement) {
+  const { top, height } = section.getBoundingClientRect()
+  return clamp(-top / height, -1, 1)
+}
+
+function renderOpeningDrift(section: HTMLElement, drift: number) {
+  section.querySelectorAll<HTMLElement>('[data-drift-line]').forEach((line, index) => {
+    const leading = (drift < 0) === (index === 0)
+    const shift = -drift * window.innerHeight * (leading ? DRIFT_NEAR : DRIFT_FAR)
+    line.style.transform = `translate3d(0, ${shift.toFixed(1)}px, 0)`
+  })
+}
+
+// Distance of the block's resting centre from the viewport centre, in viewport heights.
+function getBlockDrift(block: HTMLElement, drift: number) {
+  const { top, height } = block.getBoundingClientRect()
+  const viewport = window.innerHeight
+  const restingTop = top - drift * viewport * BLOCK_DRIFT
+  return clamp((restingTop + height / 2 - viewport / 2) / viewport, -1, 1)
+}
+
+function renderBlockDrift(block: HTMLElement, drift: number) {
+  block.style.transform = `translate3d(0, ${(drift * window.innerHeight * BLOCK_DRIFT).toFixed(1)}px, 0)`
+  block.style.opacity = clamp((BLOCK_FADE_END - Math.abs(drift)) / (BLOCK_FADE_END - BLOCK_FADE_START), 0, 1).toFixed(3)
+}
+
+function OpeningSection() {
+  const { ref: titleRef, revealClass } = useReveal<HTMLHeadingElement>()
+  const sectionRef = useEasedScroll<HTMLElement>(getOpeningDrift, renderOpeningDrift)
 
   return (
     <section ref={sectionRef} className="opening-section flex items-center" aria-labelledby="opening-title">
       <div className="mx-auto w-full max-w-7xl px-8">
-        <h2 id="opening-title" className={`opening-title font-light ${revealClass}`}>
+        <h2 ref={titleRef} id="opening-title" className={`opening-title font-light ${revealClass}`}>
           <span data-drift-line className="opening-line">Najlepsi geodeci</span>
           {' '}
           <span data-drift-line className="opening-line">w regionie</span>
@@ -162,10 +187,10 @@ function OpeningSection() {
 }
 
 function AboutBlock({ number, title, className = '', children }: { number: string; title: string; className?: string; children: ReactNode }) {
-  const { ref, revealClass } = useReveal<HTMLDivElement>()
+  const ref = useEasedScroll<HTMLDivElement>(getBlockDrift, renderBlockDrift)
 
   return (
-    <div ref={ref} className={`about-block ${className} ${revealClass}`}>
+    <div ref={ref} className={`about-block ${className}`}>
       <span className="about-number font-mono" aria-hidden="true">{number}</span>
       <div>
         <h3 className="about-heading font-light">{title}</h3>
@@ -196,10 +221,10 @@ function AboutSection() {
 }
 
 function OfferRow({ number, name, text }: { number: string; name: string; text: string }) {
-  const { ref, revealClass } = useReveal<HTMLLIElement>()
+  const ref = useEasedScroll<HTMLLIElement>(getBlockDrift, renderBlockDrift)
 
   return (
-    <li ref={ref} className={`offer-row ${revealClass}`}>
+    <li ref={ref} className="offer-row">
       <span className="about-number font-mono" aria-hidden="true">{number}</span>
       <h3 className="offer-name font-light">{name}</h3>
       <p className="offer-text font-mono">{text}</p>
