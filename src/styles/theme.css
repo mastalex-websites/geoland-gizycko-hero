@@ -87,6 +87,7 @@ a { text-decoration: none; }
   bottom: auto;
   height: 176px;
   background: linear-gradient(to bottom, #fff 0%, #fffffff5 42%, #ffffffb3 70%, #ffffff00 100%);
+  opacity: var(--mist-opacity, 1);
 }
 .story-outro {
   left: max(32px, calc((100vw - 1216px) / 2));

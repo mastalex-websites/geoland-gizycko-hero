@@ -4,6 +4,9 @@ import type { RefObject } from 'react'
 const FRAME_COUNT = 240
 const CACHE_LIMIT = 24
 const CONCURRENT_LOADS = 4
+// The lens begins filling the frame at 8 s; clear the mist before entering it.
+const LENS_ENTRY_START = 192
+const LENS_ENTRY_END = 204
 const frameUrl = (index: number) => `/media/frames/frame-${String(index).padStart(4, '0')}.webp`
 
 export default function ScrollSequence({ containerRef }: { containerRef: RefObject<HTMLElement | null> }) {
@@ -49,6 +52,8 @@ export default function ScrollSequence({ containerRef }: { containerRef: RefObje
       const height = image.naturalHeight * scale
       context.drawImage(image, (viewportWidth - width) / 2, (viewportHeight - height) / 2, width, height)
       canvas.dataset.frame = String(nearest)
+      const mistOpacity = Math.max(0, Math.min(1, (LENS_ENTRY_END - nearest) / (LENS_ENTRY_END - LENS_ENTRY_START)))
+      container.style.setProperty('--mist-opacity', String(mistOpacity))
     }
 
     const trimCache = () => {

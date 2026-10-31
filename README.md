@@ -31,5 +31,10 @@ przewijaniu do czasu załadowania właściwej klatki wyświetla się najbliższa
 Obsługiwane są zmiany rozmiaru okna, odwracanie scrolla i preferencja
 ograniczenia ruchu (statyczne hero bez wydłużonego przewijania).
 
+Biała mgła jest ograniczona do górnych 176 px. Zaczyna znikać przy klatce
+192 i jest całkowicie niewidoczna od klatki 204, gdy kamera wchodzi
+w soczewkę. Jej przezroczystość zależy od faktycznie wyświetlonej klatki,
+więc działa również przy cofaniu scrolla i doczytywaniu obrazów.
+
 Fonty Instrument Serif oraz Inter importowane są w `src/styles/fonts.css`;
 animacje i przejścia sceny znajdują się w `src/styles/theme.css`.
