@@ -3,6 +3,10 @@
 Samodzielna sekcja hero w React, Vite, Tailwind CSS 4 i TypeScript.
 Jedna przypięta scena zajmuje 360 wysokości ekranu przewijania. Scroll
 steruje sekwencją klatek z filmu: w dół do przodu, w górę do tyłu.
+Napisy zmieniają się w czterech etapach: wprowadzenie, usługi,
+doświadczenie i kontakt. Przejścia są zsynchronizowane: widoczny jest jeden
+blok tekstu, bez pustych momentów i nakładania się zdań. Białe napisy mają cień i kontrastowe
+tło, które znika przy wejściu w soczewkę.
 
 ```sh
 npm install
@@ -10,6 +14,7 @@ npm run dev
 ```
 
 Build produkcyjny: `npm run build`. Podgląd buildu: `npm run preview`.
+Test ciągłości napisów podczas całej podróży: `npm test`.
 
 ## Treść i media
 

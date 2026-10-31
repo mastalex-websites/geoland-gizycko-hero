@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react'
 import type { RefObject } from 'react'
+import { getStoryState } from '../lib/storyProgress'
 
 const FRAME_COUNT = 240
 const CACHE_LIMIT = 24
@@ -23,6 +24,7 @@ export default function ScrollSequence({ containerRef }: { containerRef: RefObje
     let animationFrame = 0
     let target = 0
     let lastTarget = 0
+    let lastActiveStage = -1
     let activeLoads = 0
     let queue: number[] = []
     let viewportWidth = 0
@@ -31,7 +33,7 @@ export default function ScrollSequence({ containerRef }: { containerRef: RefObje
     const loading = new Map<number, HTMLImageElement>()
     const failed = new Set<number>()
     const preference = window.matchMedia('(prefers-reduced-motion: reduce)')
-    const heroContent = container.querySelector<HTMLElement>('.hero-content')
+    const storyPanels = [...container.querySelectorAll<HTMLElement>('[data-story-panel]')]
 
     const draw = () => {
       if (disposed || cache.size === 0) return
@@ -55,6 +57,7 @@ export default function ScrollSequence({ containerRef }: { containerRef: RefObje
       canvas.dataset.frame = String(nearest)
       const mistOpacity = Math.max(0, Math.min(1, (LENS_ENTRY_END - nearest) / (LENS_ENTRY_END - LENS_ENTRY_START)))
       container.style.setProperty('--mist-opacity', String(mistOpacity))
+      container.toggleAttribute('data-in-lens', nearest >= LENS_ENTRY_END)
     }
 
     const trimCache = () => {
@@ -128,7 +131,17 @@ export default function ScrollSequence({ containerRef }: { containerRef: RefObje
         : progress
       const nextTarget = Math.round(frameProgress * (FRAME_COUNT - 1))
       container.style.setProperty('--scroll-progress', String(progress))
-      if (heroContent) heroContent.inert = progress > 0.34
+      const story = getStoryState(progress)
+      storyPanels.forEach((panel, index) => {
+        panel.style.setProperty('--panel-opacity', String(story.opacities[index]))
+        if (lastActiveStage !== story.activeStage) {
+          panel.inert = index !== story.activeStage
+          panel.setAttribute('aria-hidden', String(index !== story.activeStage))
+          panel.dataset.active = String(index === story.activeStage)
+        }
+      })
+      lastActiveStage = story.activeStage
+      container.dataset.storyStage = String(story.activeStage)
       canvas.dataset.progress = progress.toFixed(4)
       if (nextTarget !== target || !cache.size) {
         target = nextTarget
@@ -181,6 +194,7 @@ export default function ScrollSequence({ containerRef }: { containerRef: RefObje
   return (
     <div className="sequence-scene pointer-events-none absolute inset-0 z-0" aria-hidden="true">
       <canvas ref={canvasRef} className="sequence-canvas absolute inset-0 h-full w-full" data-frame="0" />
+      <div className="sequence-contrast absolute inset-0" />
       <div className="sequence-wash absolute inset-0" />
     </div>
   )

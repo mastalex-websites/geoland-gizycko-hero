@@ -78,51 +78,61 @@ export default function App() {
       <ScrollSequence containerRef={storyRef} />
       <Navigation />
 
-      <section className="hero-content relative z-10 flex flex-col items-center justify-center px-6 text-center" aria-labelledby="hero-title">
-        <div className="animate-fade-rise mb-5 flex items-center gap-3 text-[10px] font-medium tracking-[0.2em] text-muted uppercase sm:text-[11px]">
-          <span className="h-px w-7 bg-black/25" />
+      <section className="hero-content relative z-10" aria-label="Usługi geodezyjne Geoland Giżycko">
+      <div data-story-panel="0" data-active="true" className="story-panel">
+        <div className="hero-kicker mb-5 flex items-center gap-3 text-[10px] font-medium tracking-[0.2em] text-white uppercase sm:text-[11px]">
+          <span className="h-px w-7 bg-white/65" />
           Usługi geodezyjne · Giżycko
-          <span className="h-px w-7 bg-black/25" />
+          <span className="h-px w-7 bg-white/65" />
         </div>
 
-        <h1 id="hero-title" tabIndex={-1} className="hero-title animate-fade-rise max-w-7xl font-display text-5xl leading-[0.95] font-normal tracking-[-2.46px] text-black sm:text-7xl md:text-8xl">
-          Każda wielka <em className="font-normal text-muted">wizja</em>
+        <h1 id="hero-title" tabIndex={-1} className="hero-title max-w-7xl font-display text-5xl leading-[0.95] font-normal tracking-[-2.46px] text-white sm:text-7xl md:text-8xl">
+          Każda wielka <em className="font-normal text-white">wizja</em>
           <br className="headline-break" />
-          {' '}zaczyna się od <em className="font-normal text-muted">precyzji.</em>
+          {' '}zaczyna się od <em className="font-normal text-white">precyzji.</em>
         </h1>
+      </div>
 
-        <p className="hero-description animate-fade-rise-delay mt-8 max-w-2xl text-base leading-relaxed text-muted sm:text-lg">
+      <div data-story-panel="1" data-active="false" className="story-panel" inert aria-hidden="true">
+        <p className="hero-kicker mb-5 text-[10px] font-medium tracking-[0.2em] text-white uppercase sm:text-[11px]">Od planów do realizacji</p>
+        <h2 className="hero-title max-w-7xl font-display text-5xl leading-[0.95] font-normal tracking-[-2.46px] text-white sm:text-7xl md:text-8xl">Solidne podstawy<br /><em className="font-normal">Twoich planów.</em></h2>
+        <p className="hero-description mt-8 max-w-2xl text-base leading-relaxed text-white sm:text-lg">
           Mapy do celów projektowych, pomiary powykonawcze i podziały
-          nieruchomości. Łączymy wiedzę i wieloletnie doświadczenie,
-          by Twoje plany miały solidne podstawy.
+          nieruchomości.
         </p>
+      </div>
 
-        <a href="tel:+48606803423" className="hero-cta button-dark animate-fade-rise-delay-2 mt-12 inline-flex items-center justify-center gap-7 rounded-full bg-black px-14 py-5 text-base text-white">
+      <div data-story-panel="2" data-active="false" className="story-panel story-panel-side" inert aria-hidden="true">
+        <p className="hero-kicker mb-5 text-[10px] font-medium tracking-[0.2em] text-white uppercase sm:text-[11px]">Precyzja w terenie</p>
+        <h2 className="story-heading font-display font-normal text-white">Wiedza<br />i <em>doświadczenie.</em></h2>
+        <p className="hero-description mt-8 max-w-xl text-base leading-relaxed text-white sm:text-lg">Profesjonalny sprzęt pomiarowy, nowoczesne oprogramowanie geoinformatyczne i wieloletnie doświadczenie.</p>
+      </div>
+
+      <div data-story-panel="3" data-active="false" className="story-panel story-panel-side" inert aria-hidden="true">
+        <p className="hero-kicker mb-5 text-[10px] font-medium tracking-[0.2em] text-white uppercase sm:text-[11px]">Geoland Giżycko</p>
+        <h2 className="story-heading font-display font-normal text-white">Precyzja u podstaw<br /><em>Twoich planów.</em></h2>
+        <a href="tel:+48606803423" className="hero-cta button-dark mt-10 inline-flex items-center justify-center gap-7 rounded-full border border-white/40 bg-black px-10 py-5 text-base text-white">
           Porozmawiajmy o projekcie
           <ArrowUpRight className="shrink-0" />
         </a>
-        <p className="animate-fade-rise-delay-2 mt-5 text-[11px] tracking-[0.015em] text-muted">Geodeta uprawniony inż. Marcin Stemplewski</p>
+        <p className="hero-credential mt-5 text-[11px] tracking-[0.015em] text-white">Geodeta uprawniony inż. Marcin Stemplewski</p>
+      </div>
       </section>
 
-      <div className="story-outro pointer-events-none absolute z-10" aria-hidden="true">
-        <p className="mb-4 text-[10px] tracking-[0.2em] text-muted uppercase">Geoland Giżycko</p>
-        <p className="font-display text-5xl leading-[1.05] tracking-tight text-black sm:text-6xl">Precyzja u podstaw<br /><em className="text-muted">Twoich planów.</em></p>
-      </div>
-
       <div className="scroll-cue pointer-events-none absolute z-20 flex flex-col items-center gap-3" aria-hidden="true">
-        <span className="text-[9px] font-medium tracking-[0.18em] text-black/70 uppercase">Przewiń, by odkryć</span>
-        <span className="scroll-track relative block h-10 w-px overflow-hidden bg-black/15"><span className="scroll-track-fill absolute inset-x-0 top-0 bg-black/65" /></span>
+        <span className="text-[9px] font-medium tracking-[0.18em] text-white uppercase">Przewiń, by odkryć</span>
+        <span className="scroll-track relative block h-10 w-px overflow-hidden bg-white/35"><span className="scroll-track-fill absolute inset-x-0 top-0 bg-white" /></span>
       </div>
 
       <div id="kontakt" className="hero-bottom relative z-10 mx-auto flex w-full max-w-7xl items-end justify-between gap-6 px-8 pb-7">
         <a className="address-link group flex items-center gap-3" href="https://www.google.com/maps/search/?api=1&query=Suwalska+30+11-500+Gi%C5%BCycko" target="_blank" rel="noreferrer" aria-label="Otwórz adres: ul. Suwalska 30, 11-500 Giżycko w Mapach Google">
-          <span className="flex h-9 w-9 items-center justify-center rounded-full border border-black/10 bg-white/55 backdrop-blur-md">
+          <span className="flex h-9 w-9 items-center justify-center rounded-full border border-white/30 bg-black/35 text-white backdrop-blur-md">
             <svg width="15" height="18" viewBox="0 0 18 22" fill="none" aria-hidden="true"><path d="M16 8.5C16 14 9 20 9 20S2 14 2 8.5a7 7 0 1 1 14 0Z" stroke="currentColor" strokeWidth="1.2" /><circle cx="9" cy="8.5" r="2.25" stroke="currentColor" strokeWidth="1.2" /></svg>
           </span>
-          <span className="text-left text-[11px] leading-[1.7] text-muted"><span className="text-black">Tu zaczynają się Twoje plany.</span><br />ul. Suwalska 30, 11-500 Giżycko</span>
+          <span className="text-left text-[11px] leading-[1.7] text-white"><span className="text-white">Tu zaczynają się Twoje plany.</span><br />ul. Suwalska 30, 11-500 Giżycko</span>
         </a>
-        <a href="tel:+48606803423" className="contact-number flex items-center gap-3 text-xs text-black transition-opacity hover:opacity-60">
-          <span className="h-1.5 w-1.5 rounded-full bg-black/60" aria-hidden="true" />
+        <a href="tel:+48606803423" className="contact-number flex items-center gap-3 text-xs text-white transition-opacity hover:opacity-60">
+          <span className="h-1.5 w-1.5 rounded-full bg-white" aria-hidden="true" />
           606 803 423 <ArrowUpRight className="ml-1" />
         </a>
       </div>
