@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type ReactNode } from 'react'
+import { useEffect, useRef, useState, useSyncExternalStore, type CSSProperties, type FocusEvent, type ReactNode } from 'react'
 import ScrollSequence from './components/ScrollSequence'
 
 const navigation = [
@@ -24,6 +24,17 @@ const partners = [
 ]
 
 const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)')
+// Phones and reduced motion get a plain column instead of the pinned scene.
+const pinnedStory = window.matchMedia('(min-width: 768px) and (min-height: 561px) and (prefers-reduced-motion: no-preference)')
+// Scene timeline in viewport heights of scroll; only one thing moves at a time.
+const STORY_ABOUT_REVEAL = [0.02, 0.55]
+const STORY_ABOUT_SLIDE = [0.6, 0.9]
+const STORY_EQUIPMENT_REVEAL = [0.92, 1.3]
+const STORY_OFFER_SLIDE = [1.35, 1.65]
+const STORY_CARD_STEP = 0.28
+const STORY_OFFER_SPLIT = [3.2, 3.5]
+const STORY_PARTNER_MOVES = [[3.5, 3.8], [3.95, 4.25], [4.4, 4.7]]
+const STORY_END = 4.85
 const DRIFT_EASING = 0.09
 // The quote's scroll starts this share of the flight before its end, so the hero fades and the zoom starts on the last frames.
 const QUOTE_FLIGHT_LEAD = 0.085
@@ -100,12 +111,12 @@ function Navigation() {
   )
 }
 
-function useEasedScroll<T extends HTMLElement>(getTarget: (element: T, value: number) => number, render: (element: T, value: number) => void, runWhenReduced = false) {
+function useEasedScroll<T extends HTMLElement>(getTarget: (element: T, value: number) => number, render: (element: T, value: number) => void, { runWhenReduced = false, enabled = true } = {}) {
   const ref = useRef<T>(null)
 
   useEffect(() => {
     const element = ref.current
-    if (!element || (reducedMotion.matches && !runWhenReduced)) return
+    if (!element || !enabled || (reducedMotion.matches && !runWhenReduced)) return
 
     const easing = reducedMotion.matches ? 1 : DRIFT_EASING
     let animationFrame = 0
@@ -130,7 +141,7 @@ function useEasedScroll<T extends HTMLElement>(getTarget: (element: T, value: nu
       observer.disconnect()
       cancelAnimationFrame(animationFrame)
     }
-  }, [getTarget, render, runWhenReduced])
+  }, [getTarget, render, runWhenReduced, enabled])
 
   return ref
 }
@@ -206,8 +217,72 @@ function renderBlockDrift(block: HTMLElement, drift: number) {
   block.style.opacity = clamp((BLOCK_FADE_END - Math.abs(drift)) / (BLOCK_FADE_END - BLOCK_FADE_START), 0, 1).toFixed(3)
 }
 
+const phase = (value: number, [start, end]: number[]) => clamp((value - start) / (end - start), 0, 1)
+const eased = (value: number, range: number[]) => smoothstep(phase(value, range))
+const translateX = (x: number) => `translate3d(${x.toFixed(1)}px, 0, 0)`
+
+function getStoryPosition(stage: HTMLElement) {
+  return clamp(-stage.getBoundingClientRect().top / window.innerHeight, 0, STORY_END)
+}
+
+function revealWords(block: Element | undefined, amount: number) {
+  const words = block?.querySelectorAll<HTMLElement>('.story-word') ?? []
+  words.forEach((word, index) => {
+    const lit = phase(amount, [index / words.length * 0.85, index / words.length * 0.85 + 0.15])
+    word.style.color = `rgb(${Math.round(92 + 136 * lit)}, ${Math.round(92 + 134 * lit)}, ${Math.round(92 + 124 * lit)})`
+  })
+}
+
+function renderStory(stage: HTMLElement, position: number) {
+  const width = stage.clientWidth
+  const height = window.innerHeight
+  const query = <T extends HTMLElement>(selector: string) => stage.querySelector<T>(selector)
+  const blocks = stage.querySelectorAll('.about-block')
+
+  const slid = eased(position, STORY_ABOUT_SLIDE) + eased(position, STORY_OFFER_SLIDE)
+  const track = query('.story-track')
+  if (track) track.style.transform = translateX(-slid * width)
+  revealWords(blocks[0], phase(position, STORY_ABOUT_REVEAL))
+  revealWords(blocks[1], phase(position, STORY_EQUIPMENT_REVEAL))
+
+  // Each card rises over the previous one and leaves its heading showing.
+  stage.querySelectorAll<HTMLElement>('.offer-row').forEach((card, index) => {
+    if (index === 0) return
+    const start = STORY_OFFER_SLIDE[1] + (index - 1) * STORY_CARD_STEP
+    const open = eased(position, [start, start + STORY_CARD_STEP * 0.8])
+    card.style.transform = `translate3d(0, ${((1 - open) * height * 1.1).toFixed(1)}px, 0)`
+  })
+
+  // The offer opens to both sides, clearing the screen before the next name arrives.
+  const split = eased(position, STORY_OFFER_SPLIT) * width * 0.7
+  const title = query('.offer-title')
+  const list = query('.offer-list')
+  if (title) title.style.transform = translateX(-split)
+  if (list) list.style.transform = translateX(split)
+
+  // Every name enters from the side and pushes the previous one out along the same line.
+  const shown = STORY_PARTNER_MOVES.reduce((sum, move) => sum + eased(position, move), -1)
+  stage.querySelectorAll<HTMLElement>('.partners-item').forEach((item, index) => {
+    item.style.transform = translateX((index - shown) * width)
+  })
+  const label = query('.partners-title')
+  const progress = query('.partners-progress')
+  const labelOpacity = phase(position, [STORY_OFFER_SPLIT[1] - 0.08, STORY_OFFER_SPLIT[1] + 0.1]).toFixed(3)
+  if (label) label.style.opacity = labelOpacity
+  if (progress) {
+    progress.style.opacity = labelOpacity
+    progress.style.setProperty('--partners-shown', ((shown + 1) / STORY_PARTNER_MOVES.length).toFixed(3))
+  }
+}
+
+function WordReveal({ text }: { text: string }) {
+  return text.split(' ').map((word, index) => (
+    <span key={index}>{index > 0 && ' '}<span className="story-word">{word}</span></span>
+  ))
+}
+
 function OpeningQuote() {
-  const stageRef = useEasedScroll<HTMLElement>(getQuoteProgress, renderQuote, true)
+  const stageRef = useEasedScroll<HTMLElement>(getQuoteProgress, renderQuote, { runWhenReduced: true })
 
   return (
     <section ref={stageRef} className="quote-stage pointer-events-none absolute inset-0 z-[25] flex items-center" aria-labelledby="opening-title">
@@ -223,8 +298,8 @@ function OpeningQuote() {
   )
 }
 
-function AboutBlock({ number, title, className = '', children }: { number: string; title: string; className?: string; children: ReactNode }) {
-  const ref = useEasedScroll<HTMLDivElement>(getBlockDrift, renderBlockDrift)
+function AboutBlock({ number, title, className = '', drift, children }: { number: string; title: string; className?: string; drift: boolean; children: ReactNode }) {
+  const ref = useEasedScroll<HTMLDivElement>(getBlockDrift, renderBlockDrift, { enabled: drift })
 
   return (
     <div ref={ref} className={`about-block ${className}`}>
@@ -237,31 +312,32 @@ function AboutBlock({ number, title, className = '', children }: { number: strin
   )
 }
 
-function AboutSection() {
+function AboutSection({ drift }: { drift: boolean }) {
   return (
     <section className="about-section" aria-label="O firmie">
       <div className="about-grid mx-auto w-full max-w-7xl px-8">
-        <AboutBlock number="01." title="Kompleksowe usługi">
+        <AboutBlock number="01." title="Kompleksowe usługi" drift={drift}>
           <p className="about-text font-mono">
-            Geoland-Giżycko jest małą firmą geodezyjną oferującą kompleksowe usługi z zakresu pomiarów powykonawczych, map do celów projektowych i podziałów nieruchomości. Wiedza oraz wieloletnie doświadczenie zdobyte podczas realizacji zleceń geodezyjnych na terenie całego kraju, pozwalają nam na wykonanie usług na najwyższym poziomie.
+            <WordReveal text="Geoland-Giżycko jest małą firmą geodezyjną oferującą kompleksowe usługi z zakresu pomiarów powykonawczych, map do celów projektowych i podziałów nieruchomości. Wiedza oraz wieloletnie doświadczenie zdobyte podczas realizacji zleceń geodezyjnych na terenie całego kraju, pozwalają nam na wykonanie usług na najwyższym poziomie." />
           </p>
         </AboutBlock>
-        <AboutBlock number="02." title="Sprzęt i oprogramowanie" className="about-block-offset">
+        <AboutBlock number="02." title="Sprzęt i oprogramowanie" className="about-block-offset" drift={drift}>
           <p className="about-text font-mono">
-            Dysponujemy profesjonalnym sprzętem pomiarowym oraz najnowszym oprogramowaniem geo-informatycznym co pozwala nam na wykonywanie usług na najwyższym poziomie. Gwarantujemy naszym klientom satysfakcję oraz zadowolenie z powierzonych nam prac.
+            <WordReveal text="Dysponujemy profesjonalnym sprzętem pomiarowym oraz najnowszym oprogramowaniem geo-informatycznym co pozwala nam na wykonywanie usług na najwyższym poziomie. Gwarantujemy naszym klientom satysfakcję oraz zadowolenie z powierzonych nam prac." />
           </p>
-          <p className="about-signature font-mono">inż. Marcin Stemplewski</p>
+          <p className="about-signature font-mono"><WordReveal text="inż. Marcin Stemplewski" /></p>
         </AboutBlock>
       </div>
     </section>
   )
 }
 
-function OfferRow({ number, name, text }: { number: string; name: string; text: string }) {
-  const ref = useEasedScroll<HTMLLIElement>(getBlockDrift, renderBlockDrift)
+function OfferRow({ index, name, text, drift }: { index: number; name: string; text: string; drift: boolean }) {
+  const ref = useEasedScroll<HTMLLIElement>(getBlockDrift, renderBlockDrift, { enabled: drift })
+  const number = `${String(index + 1).padStart(2, '0')}.`
 
   return (
-    <li ref={ref} className="offer-row">
+    <li ref={ref} className="offer-row" style={{ '--card': index } as CSSProperties}>
       <span className="about-number font-mono" aria-hidden="true">{number}</span>
       <h3 className="offer-name font-light">{name}</h3>
       <p className="offer-text font-mono">{text}</p>
@@ -269,14 +345,14 @@ function OfferRow({ number, name, text }: { number: string; name: string; text: 
   )
 }
 
-function OfferSection() {
+function OfferSection({ drift }: { drift: boolean }) {
   return (
     <section className="offer-section" aria-labelledby="offer-title">
-      <div className="mx-auto w-full max-w-7xl px-8">
+      <div className="offer-layout mx-auto w-full max-w-7xl px-8">
         <h2 id="offer-title" className="offer-title font-light">Oferta</h2>
         <ol className="offer-list">
           {offers.map((offer, index) => (
-            <OfferRow key={offer.name} number={`${String(index + 1).padStart(2, '0')}.`} name={offer.name} text={offer.text} />
+            <OfferRow key={offer.name} index={index} name={offer.name} text={offer.text} drift={drift} />
           ))}
         </ol>
       </div>
@@ -284,22 +360,52 @@ function OfferSection() {
   )
 }
 
-function PartnersSection() {
-  const ref = useEasedScroll<HTMLDivElement>(getBlockDrift, renderBlockDrift)
+// Keyboard focus brings the name on screen, because it may still be waiting off to the side.
+function showPartner(event: FocusEvent<HTMLAnchorElement>, index: number) {
+  const stage = event.currentTarget.closest<HTMLElement>('.story-stage[data-pinned]')
+  if (stage) window.scrollTo(0, stage.getBoundingClientRect().top + window.scrollY + STORY_PARTNER_MOVES[index][1] * window.innerHeight)
+}
+
+function PartnersSection({ drift }: { drift: boolean }) {
+  const ref = useEasedScroll<HTMLDivElement>(getBlockDrift, renderBlockDrift, { enabled: drift })
 
   return (
     <section className="partners-section" aria-labelledby="partners-title">
       <div ref={ref} className="partners-block mx-auto w-full max-w-7xl px-8">
         <h2 id="partners-title" className="partners-title font-mono">Współpracujemy</h2>
+        <div className="partners-progress" aria-hidden="true" />
         <ul className="partners-list">
-          {partners.map((partner) => (
+          {partners.map((partner, index) => (
             <li key={partner.name} className="partners-item">
-              <a href={partner.href} target="_blank" rel="noreferrer" className="partners-link dark-link font-light">{partner.name}</a>
+              <a href={partner.href} target="_blank" rel="noreferrer" className="partners-link dark-link font-light" onFocus={(event) => showPartner(event, index)}>{partner.name}</a>
             </li>
           ))}
         </ul>
       </div>
     </section>
+  )
+}
+
+const subscribePinnedStory = (onChange: () => void) => {
+  pinnedStory.addEventListener('change', onChange)
+  return () => pinnedStory.removeEventListener('change', onChange)
+}
+
+function StoryStage() {
+  const pinned = useSyncExternalStore(subscribePinnedStory, () => pinnedStory.matches)
+  const ref = useEasedScroll<HTMLDivElement>(getStoryPosition, renderStory, { enabled: pinned })
+
+  // Remounting on a layout change drops every inline style left by the other layout.
+  return (
+    <div key={String(pinned)} ref={ref} className="story-stage" data-pinned={pinned || undefined}>
+      <div className="story-camera">
+        <div className="story-track">
+          <AboutSection drift={!pinned} />
+          <OfferSection drift={!pinned} />
+        </div>
+        <PartnersSection drift={!pinned} />
+      </div>
+    </div>
   )
 }
 
@@ -406,9 +512,7 @@ export default function App() {
       <OpeningQuote />
       </div>
     </main>
-    <AboutSection />
-    <OfferSection />
-    <PartnersSection />
+    <StoryStage />
     <ContactSection />
     </>
   )

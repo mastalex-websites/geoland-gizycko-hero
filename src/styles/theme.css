@@ -137,7 +137,8 @@ a { text-decoration: none; }
 .quote-backdrop { background: #151515; opacity: 0; }
 .opening-title { position: relative; width: fit-content; margin: 0; font-size: clamp(36px, 8vw, 116px); line-height: 1.02; letter-spacing: -0.03em; white-space: nowrap; opacity: 0; }
 .opening-line { display: block; width: fit-content; }
-.about-section { position: relative; z-index: 1; margin-top: -3px; padding-block: clamp(72px, 10vw, 140px) clamp(120px, 16vw, 240px); background: #151515; color: #e4e2d8; }
+.story-stage { position: relative; z-index: 1; margin-top: -3px; background: #151515; }
+.about-section { padding-block: clamp(72px, 10vw, 140px) clamp(120px, 16vw, 240px); background: #151515; color: #e4e2d8; }
 .about-grid { display: flex; flex-direction: column; gap: clamp(72px, 9vw, 140px); }
 .about-block { display: flex; gap: 12px; max-width: 520px; will-change: transform, opacity; }
 .about-block-offset { margin-left: 50%; }
@@ -161,12 +162,39 @@ a { text-decoration: none; }
 .dark-link { transition: opacity 240ms ease; }
 .dark-link:hover { opacity: 0.6; }
 .dark-link:focus-visible { outline-color: #e4e2d8; }
-.contact-section { overflow: clip; padding-bottom: clamp(64px, 8vw, 112px); background: #151515; color: #e4e2d8; }
+.partners-progress { display: none; }
+.contact-section { position: relative; z-index: 2; overflow: clip; padding-block: clamp(64px, 8vw, 112px); background: #e4e2d8; color: #151515; }
+.contact-section .dark-link:focus-visible { outline-color: #151515; }
 .contact-block { will-change: transform, opacity; }
-.contact-grid { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); gap: 48px 24px; padding-top: clamp(28px, 3vw, 44px); border-top: 1px solid #424242; }
+.contact-grid { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); gap: 48px 24px; padding-top: clamp(28px, 3vw, 44px); border-top: 1px solid #15151540; }
 .contact-name { margin: 0 0 16px; font-size: clamp(22px, 2.6vw, 36px); line-height: 1.15; letter-spacing: -0.02em; }
 .contact-details { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 32px 24px; }
 .contact-text { margin: 0; font-size: 14px; line-height: 1.65; overflow-wrap: anywhere; }
+.story-stage[data-pinned] { --gutter: max(32px, calc((100vw - 1280px) / 2 + 32px)); height: 685vh; height: 685svh; }
+.story-stage[data-pinned] .story-camera { position: sticky; top: 0; height: 100vh; height: 100svh; overflow: clip; }
+.story-stage[data-pinned] .story-track { display: flex; width: 300%; height: 100%; will-change: transform; }
+.story-stage[data-pinned] .about-section { flex: 2; padding: 0; background: none; }
+.story-stage[data-pinned] .about-grid { flex-direction: row; gap: 0; max-width: none; height: 100%; padding: 0; }
+.story-stage[data-pinned] .about-block { flex: 1; display: grid; grid-template-columns: auto minmax(0, 1fr); align-content: center; max-width: none; margin: 0; padding-inline: var(--gutter); }
+.story-stage[data-pinned] .about-heading { font-size: clamp(16px, 1.4vw, 20px); letter-spacing: 0; color: #9b9b9b; }
+.story-stage[data-pinned] .about-text, .story-stage[data-pinned] .about-signature { font-family: var(--font-sans); font-weight: 300; font-size: clamp(22px, 2.9vw, 42px); line-height: 1.24; letter-spacing: -0.02em; color: #5c5c5c; }
+.story-stage[data-pinned] .offer-section { flex: 1; margin: 0; padding: 0; background: none; }
+.story-stage[data-pinned] .offer-layout { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); gap: 24px; height: 100%; padding-block: 8vh; padding-block: 8svh; }
+.story-stage[data-pinned] .offer-title { margin: 0; will-change: transform; }
+.story-stage[data-pinned] .offer-list { --peek: clamp(48px, 7svh, 64px); position: relative; border: 0; will-change: transform; }
+.story-stage[data-pinned] .offer-row { position: absolute; inset: calc(var(--card) * var(--peek)) 0 0; display: grid; grid-template-columns: 40px minmax(0, 1fr); grid-template-rows: var(--peek) 1fr; gap: 0; padding: 0 24px; border: 0; border-radius: 20px; background: #e4e2d8; color: #151515; box-shadow: 0 -10px 30px #0000004d; will-change: transform; }
+.story-stage[data-pinned] .offer-row .about-number { align-self: center; margin: 0; padding: 0; color: #15151599; }
+.story-stage[data-pinned] .offer-name { align-self: center; font-size: clamp(18px, 1.9vw, 26px); }
+.story-stage[data-pinned] .offer-text { grid-column: 2; max-width: 56ch; padding-top: 12px; font-size: clamp(15px, 1.3vw, 18px); }
+.story-stage[data-pinned] .partners-section { position: absolute; inset: 0; padding: 0; background: none; pointer-events: none; }
+.story-stage[data-pinned] .partners-block { max-width: none; height: 100%; padding: 0; }
+.story-stage[data-pinned] .partners-title { position: absolute; top: 8svh; left: var(--gutter); margin: 0; opacity: 0; }
+.story-stage[data-pinned] .partners-progress { position: absolute; top: calc(8svh + 28px); right: var(--gutter); left: var(--gutter); display: block; height: 1px; background: #424242; opacity: 0; }
+.story-stage[data-pinned] .partners-progress::after { content: ''; display: block; height: 1px; background: #e4e2d8; transform: scaleX(var(--partners-shown, 0)); transform-origin: left; }
+.story-stage[data-pinned] .partners-list { display: block; height: 100%; border: 0; }
+.story-stage[data-pinned] .partners-item { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; border: 0; transform: translate3d(100vw, 0, 0); will-change: transform; }
+.story-stage[data-pinned] .partners-link { height: auto; max-width: 1200px; padding: 0 32px; font-size: clamp(44px, 8vw, 116px); line-height: 1.02; letter-spacing: -0.03em; text-align: center; pointer-events: auto; }
+.story-stage[data-pinned] + .contact-section { display: flex; align-items: center; min-height: 100vh; min-height: 100svh; margin-top: -100vh; margin-top: -100svh; }
 .mobile-toggle { display: none; }
 .skip-link { position: fixed; z-index: 100; top: 12px; left: 12px; transform: translateY(-160%); padding: 12px 20px; background: #000; color: #fff; border-radius: 30px; }
 .skip-link:focus { transform: translateY(0); }
