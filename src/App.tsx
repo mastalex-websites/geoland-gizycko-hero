@@ -48,6 +48,7 @@ function ArrowUpRight({ className = '' }: { className?: string }) {
 
 function Navigation() {
   const [menuOpen, setMenuOpen] = useState(false)
+  const [focusedControl, setFocusedControl] = useState<string | null>(null)
   const navigationRef = useRef<HTMLElement>(null)
   const toggleRef = useRef<HTMLButtonElement>(null)
 
@@ -70,29 +71,34 @@ function Navigation() {
     }
   }, [menuOpen])
 
-  return (
-    <header ref={navigationRef} className="relative z-30">
+  const renderLayer = (visualCopy = false) => (
+    <header ref={visualCopy ? undefined : navigationRef} className={visualCopy ? 'relative' : 'navigation-base-layer relative'}
+      onFocusCapture={visualCopy ? undefined : (event) => {
+        const target = event.target as HTMLElement
+        setFocusedControl(target.matches(':focus-visible') ? target.dataset.navControl ?? null : null)
+      }}
+      onBlurCapture={visualCopy ? undefined : () => setFocusedControl(null)}>
       <nav className="navigation-shell mx-auto flex max-w-7xl items-center justify-between px-8 py-6" aria-label="Nawigacja główna">
-        <a href="#start" aria-label="Geoland Giżycko — strona główna" className="wordmark flex items-baseline gap-2 text-black">
+        <a href="#start" data-nav-control="logo" data-visual-focus={visualCopy && focusedControl === 'logo' || undefined} aria-label="Geoland Giżycko — strona główna" className="wordmark flex items-baseline gap-2 text-black">
           <span className="font-display text-[35px] leading-none tracking-tight">Geoland<span className="logo-point">.</span></span>
           <span className="relative -top-3 text-[9px] font-medium tracking-[0.16em] uppercase">Giżycko</span>
         </a>
         <div className="desktop-navigation flex items-center gap-9">
           {navigation.map((item) => (
-            <a key={item.label} href={item.href} aria-current={item.current ? 'page' : undefined} className={`nav-link text-sm transition-colors hover:text-black ${item.current ? 'text-black' : 'text-muted'}`}>
+            <a key={item.label} href={item.href} data-nav-control={item.label} data-visual-focus={visualCopy && focusedControl === item.label || undefined} aria-current={item.current ? 'page' : undefined} className={`nav-link text-sm transition-colors hover:text-black ${item.current ? 'text-black' : 'text-muted'}`}>
               {item.label}
             </a>
           ))}
         </div>
-        <a href="tel:+48606803423" className="nav-cta button-dark flex items-center gap-5 rounded-full bg-black px-6 py-2.5 text-sm text-white">
+        <a href="tel:+48606803423" data-nav-control="cta" data-visual-focus={visualCopy && focusedControl === 'cta' || undefined} className="nav-cta button-dark flex items-center gap-5 rounded-full bg-black px-6 py-2.5 text-sm text-white">
           Porozmawiajmy <ArrowUpRight />
         </a>
-        <button ref={toggleRef} type="button" className="mobile-toggle flex h-11 w-11 flex-col items-center justify-center gap-[5px] rounded-full border border-black/10 bg-white/75" aria-label={menuOpen ? 'Zamknij menu' : 'Otwórz menu'} aria-expanded={menuOpen} aria-controls="mobile-menu" onClick={() => setMenuOpen((current) => !current)}>
+        <button ref={visualCopy ? undefined : toggleRef} data-nav-control="menu" data-visual-focus={visualCopy && focusedControl === 'menu' || undefined} type="button" className="mobile-toggle flex h-11 w-11 flex-col items-center justify-center gap-[5px] rounded-full border border-black/10 bg-white/75" aria-label={menuOpen ? 'Zamknij menu' : 'Otwórz menu'} aria-expanded={menuOpen} aria-controls={visualCopy ? undefined : 'mobile-menu'} onClick={() => setMenuOpen((current) => !current)}>
           <span className={`h-px w-[18px] bg-black transition-transform ${menuOpen ? 'translate-y-[3px] rotate-45' : ''}`} />
           <span className={`h-px w-[18px] bg-black transition-transform ${menuOpen ? '-translate-y-[3px] -rotate-45' : ''}`} />
         </button>
       </nav>
-      {menuOpen && (
+      {menuOpen && !visualCopy && (
         <nav id="mobile-menu" aria-label="Menu mobilne" className="mobile-menu absolute right-6 left-6 top-full flex flex-col gap-1 rounded-2xl border border-black/10 bg-white/95 p-3 shadow-xl shadow-black/5 backdrop-blur-xl">
           {navigation.map((item) => <a key={item.label} href={item.href} className="rounded-xl px-5 py-3.5 text-sm text-black hover:bg-black/5" onClick={() => setMenuOpen(false)}>{item.label}</a>)}
           <a href="tel:+48606803423" className="mt-1 rounded-xl bg-black px-5 py-3.5 text-sm text-white">Zadzwoń: 606 803 423</a>
@@ -100,6 +106,11 @@ function Navigation() {
       )}
     </header>
   )
+
+  return <>
+    {renderLayer()}
+    <div className="navigation-contact-layer" aria-hidden="true" inert>{renderLayer(true)}</div>
+  </>
 }
 
 function useEasedScroll<T extends HTMLElement>(getTarget: (element: T, value: number) => number, render: (element: T, value: number) => void, { runWhenReduced = false, enabled = true } = {}) {

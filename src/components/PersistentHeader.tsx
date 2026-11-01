@@ -18,11 +18,9 @@ export default function PersistentHeader({ navigation }: { navigation: ReactNode
       const middle = height / 2
       const pastHero = hero.getBoundingClientRect().bottom <= middle
       const surface = getNavigationSurface(contact?.getBoundingClientRect().top ?? Infinity, height)
-      header.style.setProperty('--navigation-background', `rgb(${surface.background.join(', ')})`)
-      header.style.setProperty('--navigation-muted-ink', `rgb(${surface.mutedInk}, ${surface.mutedInk}, ${surface.mutedInk})`)
-      header.dataset.tone = pastHero ? surface.tone : hero.hasAttribute('data-in-lens') ? 'dark' : 'light'
+      header.style.setProperty('--navigation-contact-top', `${surface.boundary}px`)
+      header.dataset.tone = pastHero || hero.hasAttribute('data-in-lens') ? 'dark' : 'light'
       header.dataset.surface = pastHero ? 'page' : 'hero'
-      header.dataset.contactTransition = String(pastHero && surface.transitioning)
     }
     const schedule = () => {
       if (!frame) frame = requestAnimationFrame(update)
