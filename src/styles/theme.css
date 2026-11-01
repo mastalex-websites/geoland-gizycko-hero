@@ -34,7 +34,8 @@ a { text-decoration: none; }
 ::selection { background: #dedfd4; color: #000; }
 :focus-visible { outline: 2px solid #000; outline-offset: 6px; }
 
-.story-shell { height: 360vh; height: 360svh; --scroll-progress: 0; }
+.story-shell { height: 600vh; height: 600svh; --scroll-progress: 0; }
+.flight-track { height: 360vh; height: 360svh; }
 .hero-shell {
   height: 100vh;
   height: 100svh;
@@ -130,10 +131,13 @@ a { text-decoration: none; }
 }
 .scroll-track-fill { height: calc(15% + var(--scroll-progress) * 500%); }
 .story-progress { transform: scaleX(var(--scroll-progress)); }
-.opening-section { position: relative; z-index: 1; margin-top: -3px; min-height: 100vh; min-height: 100svh; overflow: clip; background: linear-gradient(to bottom, #000, #151515); color: #e4e2d8; }
-.opening-title { margin: 0; font-size: clamp(40px, 8vw, 116px); line-height: 1.02; letter-spacing: -0.03em; }
-.opening-line { display: block; will-change: transform; }
-.about-section { margin-top: -1px; padding-block: clamp(72px, 10vw, 140px) clamp(120px, 16vw, 240px); background: #151515; color: #e4e2d8; }
+.hero-shell > header, .hero-content, .hero-bottom { opacity: var(--hero-fade, 1); }
+[data-hero-faded] > header, [data-hero-faded] > .hero-content, [data-hero-faded] > .hero-bottom { visibility: hidden; }
+.quote-stage { color: #e4e2d8; }
+.quote-backdrop { background: #151515; opacity: 0; }
+.opening-title { position: relative; width: fit-content; margin: 0; font-size: clamp(36px, 8vw, 116px); line-height: 1.02; letter-spacing: -0.03em; white-space: nowrap; opacity: 0; }
+.opening-line { display: block; width: fit-content; }
+.about-section { position: relative; z-index: 1; margin-top: -3px; padding-block: clamp(72px, 10vw, 140px) clamp(120px, 16vw, 240px); background: #151515; color: #e4e2d8; }
 .about-grid { display: flex; flex-direction: column; gap: clamp(72px, 9vw, 140px); }
 .about-block { display: flex; gap: 12px; max-width: 520px; will-change: transform, opacity; }
 .about-block-offset { margin-left: 50%; }

@@ -17,10 +17,14 @@ const offers = [
   { name: 'PODZIAŁY NIERUCHOMOŚCI', text: 'Wydzielenie części działki jako odrębnej nieruchomości lub do włączenia w inną działkę, np. na sprzedaż, pod budowę lub uprawę.' },
 ]
 
-// Share of the viewport height each opening line travels; the gap between lines opens away from the centre.
-const DRIFT_NEAR = 0.2
-const DRIFT_FAR = 0.36
+const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)')
 const DRIFT_EASING = 0.09
+// Stages of the quote as shares of the scroll that follows the flight: hero fade, growth from the lens, move to the left.
+const QUOTE_FADE_END = 0.1
+const QUOTE_GROW_START = 0.06
+const QUOTE_GROW_END = 0.62
+const QUOTE_MOVE_END = 0.9
+const QUOTE_MIN_SCALE = 0.008
 // Blocks below the opening: travel per viewport height, and the distances from centre where they start and finish fading.
 const BLOCK_DRIFT = 0.12
 const BLOCK_FADE_START = 0.35
@@ -86,37 +90,18 @@ function Navigation() {
   )
 }
 
-function useReveal<T extends HTMLElement>() {
-  const ref = useRef<T>(null)
-  const [visible, setVisible] = useState(false)
-
-  useEffect(() => {
-    const element = ref.current
-    if (!element) return
-    const observer = new IntersectionObserver(([entry]) => {
-      if (entry.isIntersecting) {
-        setVisible(true)
-        observer.disconnect()
-      }
-    }, { threshold: 0.35 })
-    observer.observe(element)
-    return () => observer.disconnect()
-  }, [])
-
-  return { ref, revealClass: visible ? 'animate-fade-rise' : 'opacity-0' }
-}
-
-function useEasedScroll<T extends HTMLElement>(getTarget: (element: T, value: number) => number, render: (element: T, value: number) => void) {
+function useEasedScroll<T extends HTMLElement>(getTarget: (element: T, value: number) => number, render: (element: T, value: number) => void, runWhenReduced = false) {
   const ref = useRef<T>(null)
 
   useEffect(() => {
     const element = ref.current
-    if (!element || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+    if (!element || (reducedMotion.matches && !runWhenReduced)) return
 
+    const easing = reducedMotion.matches ? 1 : DRIFT_EASING
     let animationFrame = 0
     let value = getTarget(element, 0)
     const tick = () => {
-      value += (getTarget(element, value) - value) * DRIFT_EASING
+      value += (getTarget(element, value) - value) * easing
       render(element, value)
       animationFrame = requestAnimationFrame(tick)
     }
@@ -135,24 +120,53 @@ function useEasedScroll<T extends HTMLElement>(getTarget: (element: T, value: nu
       observer.disconnect()
       cancelAnimationFrame(animationFrame)
     }
-  }, [getTarget, render])
+  }, [getTarget, render, runWhenReduced])
 
   return ref
 }
 
 const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value))
 
-// -1 when the section enters from below, 0 when it fills the viewport, 1 when it has left.
-function getOpeningDrift(section: HTMLElement) {
-  const { top, height } = section.getBoundingClientRect()
-  return clamp(-top / height, -1, 1)
+const smoothstep = (value: number) => {
+  const position = clamp(value, 0, 1)
+  return position * position * (3 - 2 * position)
 }
 
-function renderOpeningDrift(section: HTMLElement, drift: number) {
-  section.querySelectorAll<HTMLElement>('[data-drift-line]').forEach((line, index) => {
-    const leading = (drift < 0) === (index === 0)
-    const shift = -drift * window.innerHeight * (leading ? DRIFT_NEAR : DRIFT_FAR)
-    line.style.transform = `translate3d(0, ${shift.toFixed(1)}px, 0)`
+// 0 until the flight ends, 1 when the hero is about to unpin.
+function getQuoteProgress(stage: HTMLElement) {
+  const shell = stage.closest('main')
+  const flight = shell?.querySelector<HTMLElement>('.flight-track')
+  if (!shell || !flight) return 0
+  const flown = -shell.getBoundingClientRect().top - (flight.offsetHeight - window.innerHeight)
+  return clamp(flown / Math.max(1, shell.offsetHeight - flight.offsetHeight), 0, 1)
+}
+
+function renderQuote(stage: HTMLElement, progress: number) {
+  const title = stage.querySelector<HTMLElement>('.opening-title')
+  const backdrop = stage.querySelector<HTMLElement>('.quote-backdrop')
+  const hero = stage.closest<HTMLElement>('.hero-shell')
+  if (!title || !backdrop || !hero) return
+
+  const heroFade = 1 - clamp(progress / QUOTE_FADE_END, 0, 1)
+  hero.style.setProperty('--hero-fade', heroFade.toFixed(3))
+  hero.toggleAttribute('data-hero-faded', heroFade === 0)
+  backdrop.style.opacity = smoothstep((progress - QUOTE_GROW_END) / (1 - QUOTE_GROW_END)).toFixed(3)
+
+  if (reducedMotion.matches) {
+    title.style.opacity = smoothstep((progress - QUOTE_FADE_END) / QUOTE_FADE_END).toFixed(3)
+    return
+  }
+
+  // The zoom is exponential so the text seems to approach at a constant speed.
+  const grow = smoothstep((progress - QUOTE_GROW_START) / (QUOTE_GROW_END - QUOTE_GROW_START))
+  const move = smoothstep((progress - QUOTE_GROW_END) / (QUOTE_MOVE_END - QUOTE_GROW_END))
+  const scale = QUOTE_MIN_SCALE ** (1 - grow)
+  const offset = (stage.clientWidth / 2 - title.offsetLeft - title.offsetWidth / 2) * (1 - move)
+  title.style.opacity = clamp((progress - QUOTE_GROW_START) / QUOTE_GROW_START, 0, 1).toFixed(3)
+  title.style.transform = `translate(${offset.toFixed(1)}px, 0) scale(${scale.toFixed(4)})`
+  // Lines start centred on the lens and settle into left alignment.
+  title.querySelectorAll<HTMLElement>('.opening-line').forEach((line) => {
+    line.style.transform = `translateX(${(((title.offsetWidth - line.offsetWidth) / 2) * (1 - move)).toFixed(1)}px)`
   })
 }
 
@@ -169,17 +183,17 @@ function renderBlockDrift(block: HTMLElement, drift: number) {
   block.style.opacity = clamp((BLOCK_FADE_END - Math.abs(drift)) / (BLOCK_FADE_END - BLOCK_FADE_START), 0, 1).toFixed(3)
 }
 
-function OpeningSection() {
-  const { ref: titleRef, revealClass } = useReveal<HTMLHeadingElement>()
-  const sectionRef = useEasedScroll<HTMLElement>(getOpeningDrift, renderOpeningDrift)
+function OpeningQuote() {
+  const stageRef = useEasedScroll<HTMLElement>(getQuoteProgress, renderQuote, true)
 
   return (
-    <section ref={sectionRef} className="opening-section flex items-center" aria-labelledby="opening-title">
+    <section ref={stageRef} className="quote-stage pointer-events-none absolute inset-0 z-[25] flex items-center" aria-labelledby="opening-title">
+      <div className="quote-backdrop absolute inset-0" />
       <div className="mx-auto w-full max-w-7xl px-8">
-        <h2 ref={titleRef} id="opening-title" className={`opening-title font-light ${revealClass}`}>
-          <span data-drift-line className="opening-line">Najlepsi geodeci</span>
+        <h2 id="opening-title" className="opening-title font-light">
+          <span className="opening-line">„Najlepsi geodeci</span>
           {' '}
-          <span data-drift-line className="opening-line">w regionie</span>
+          <span className="opening-line">w regionie”</span>
         </h2>
       </div>
     </section>
@@ -249,13 +263,15 @@ function OfferSection() {
 
 export default function App() {
   const storyRef = useRef<HTMLElement>(null)
+  const flightRef = useRef<HTMLDivElement>(null)
 
   return (
     <>
     <main id="start" ref={storyRef} className="story-shell relative w-full bg-background">
+      <div ref={flightRef} className="flight-track pointer-events-none absolute inset-x-0 top-0" aria-hidden="true" />
       <div className="hero-shell sticky top-0 isolate w-full overflow-hidden bg-background">
       <a href="#hero-title" className="skip-link">Przejdź do treści</a>
-      <ScrollSequence containerRef={storyRef} />
+      <ScrollSequence containerRef={storyRef} flightRef={flightRef} />
       <Navigation />
 
       <section className="hero-content relative z-10" aria-label="Usługi geodezyjne Geoland Giżycko">
@@ -317,9 +333,9 @@ export default function App() {
         </a>
       </div>
       <div className="story-progress absolute inset-x-0 bottom-0 z-20 h-[2px] origin-left bg-black/45" aria-hidden="true" />
+      <OpeningQuote />
       </div>
     </main>
-    <OpeningSection />
     <AboutSection />
     <OfferSection />
     </>

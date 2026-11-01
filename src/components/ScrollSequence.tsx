@@ -11,14 +11,15 @@ const LENS_ENTRY_START = 192
 const LENS_ENTRY_END = 204
 const frameUrl = (index: number) => `${import.meta.env.BASE_URL}media/frames/frame-${String(index).padStart(4, '0')}.webp`
 
-export default function ScrollSequence({ containerRef }: { containerRef: RefObject<HTMLElement | null> }) {
+export default function ScrollSequence({ containerRef, flightRef }: { containerRef: RefObject<HTMLElement | null>; flightRef: RefObject<HTMLElement | null> }) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
 
   useEffect(() => {
     const container = containerRef.current
+    const flight = flightRef.current
     const canvas = canvasRef.current
     const context = canvas?.getContext('2d', { alpha: false })
-    if (!container || !canvas || !context) return
+    if (!container || !flight || !canvas || !context) return
 
     let disposed = false
     let animationFrame = 0
@@ -124,7 +125,7 @@ export default function ScrollSequence({ containerRef }: { containerRef: RefObje
       animationFrame = 0
       if (disposed) return
       const rect = container.getBoundingClientRect()
-      const distance = Math.max(1, container.offsetHeight - window.innerHeight)
+      const distance = Math.max(1, flight.offsetHeight - window.innerHeight)
       const progress = Math.max(0, Math.min(1, -rect.top / distance))
       const frameProgress = preference.matches
         ? Math.round(progress * REDUCED_MOTION_STEPS) / REDUCED_MOTION_STEPS
@@ -189,7 +190,7 @@ export default function ScrollSequence({ containerRef }: { containerRef: RefObje
       loading.clear()
       cache.clear()
     }
-  }, [containerRef])
+  }, [containerRef, flightRef])
 
   return (
     <div className="sequence-scene pointer-events-none absolute inset-0 z-0" aria-hidden="true">
