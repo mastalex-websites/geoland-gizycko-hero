@@ -1,4 +1,4 @@
-import { useRef, type ReactNode } from 'react'
+import { useRef } from 'react'
 import HeroSequence from './HeroSequence'
 import { STORY_SCROLL_SCREENS } from '../lib/lensHandoff'
 import '../styles/hero.css'
@@ -17,7 +17,7 @@ function LensArrival() {
   )
 }
 
-export default function Hero({ navigation }: { navigation: ReactNode }) {
+export default function Hero() {
   const storyRef = useRef<HTMLElement>(null)
 
   return (
@@ -25,7 +25,6 @@ export default function Hero({ navigation }: { navigation: ReactNode }) {
       <div className="hero-shell sticky top-0 isolate w-full overflow-hidden bg-background">
       <a href="#hero-title" className="skip-link">Przejdź do treści</a>
       <HeroSequence containerRef={storyRef} />
-      {navigation}
 
       <section className="hero-content relative z-10" aria-label="Usługi geodezyjne Geoland Giżycko">
       <div data-story-panel="0" data-active="true" className="story-panel">

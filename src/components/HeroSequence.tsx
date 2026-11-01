@@ -226,6 +226,9 @@ export default function HeroSequence({ containerRef }: { containerRef: RefObject
     preference.addEventListener('change', requestUpdate)
     resize()
     loadWindow()
+    void document.fonts.ready.then(() => {
+      if (!disposed) resize()
+    })
 
     return () => {
       disposed = true

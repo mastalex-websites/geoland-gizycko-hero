@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, useSyncExternalStore, type CSSProperties, type FocusEvent, type ReactNode } from 'react'
 import Hero from './components/Hero'
+import PersistentHeader from './components/PersistentHeader'
 
 const navigation = [
   { label: 'Start', href: '#start', current: true },
@@ -364,10 +365,11 @@ function ContactSection() {
 
 export default function App() {
   return (
-    <>
-      <Hero navigation={<Navigation />} />
+    <div className="site-with-navigation">
+      <PersistentHeader navigation={<Navigation />} />
+      <Hero />
       <StoryStage />
       <ContactSection />
-    </>
+    </div>
   )
 }

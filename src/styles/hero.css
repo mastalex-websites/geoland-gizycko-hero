@@ -161,3 +161,9 @@
 .current-hero .opening-line { width: fit-content; }
 .current-hero[data-in-lens] .mobile-toggle { border-color: #ffffff50; background: transparent; }
 .current-hero[data-in-lens] .mobile-toggle > span { background: #fff; }
+
+/* Selected specimen: Manrope Regular, limited to the hero headings. */
+.current-hero .hero-title, .current-hero .story-heading, .current-hero .opening-title {
+  font-family: 'Manrope', sans-serif;
+  font-weight: 400;
+}

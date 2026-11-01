@@ -1,0 +1,28 @@
+.site-with-navigation { --site-header-height: 100px; }
+.persistent-header { position: fixed; inset: 0 0 auto; z-index: 60; isolation: isolate; }
+.persistent-header::before { content: ''; position: absolute; inset: 0 0 -24px; z-index: -1; pointer-events: none; background: linear-gradient(to bottom, var(--navigation-background, #151515) calc(100% - 24px), transparent); opacity: 0; }
+.persistent-header[data-surface='dark'] { --navigation-background: #151515; }
+.persistent-header[data-surface='light'] { --navigation-background: #e4e2d8; }
+.persistent-header[data-surface='dark']::before, .persistent-header[data-surface='light']::before { opacity: 1; }
+.persistent-header .navigation-shell { min-height: var(--site-header-height); }
+.persistent-header[data-tone='dark'] .wordmark, .persistent-header[data-tone='dark'] .nav-link { color: #fff; text-shadow: 0 1px 8px #0009; }
+.persistent-header[data-tone='dark'] .nav-link:not([aria-current]) { color: #ffffffcc; }
+.persistent-header[data-tone='dark'] .nav-link[aria-current]::after { background: #fff; }
+.persistent-header[data-tone='dark'] .nav-cta { background: #fff; color: #000; }
+.persistent-header[data-tone='dark'] .nav-cta:hover { background: #ededed; }
+.persistent-header[data-tone='dark'] .mobile-toggle { border-color: #ffffff50; background: transparent; }
+.persistent-header[data-tone='dark'] .mobile-toggle > span { background: #fff; }
+.persistent-header[data-tone='dark'] :focus-visible { outline-color: #fff; }
+.site-with-navigation .story-stage[data-pinned] .offer-layout { padding-top: max(8svh, calc(var(--site-header-height) + 24px)); }
+.site-with-navigation .story-stage[data-pinned] .partners-title { top: max(8svh, calc(var(--site-header-height) + 24px)); }
+.site-with-navigation .story-stage[data-pinned] .partners-progress { top: max(calc(8svh + 28px), calc(var(--site-header-height) + 52px)); }
+
+@media (max-width: 767px) {
+  .site-with-navigation { --site-header-height: 88px; }
+}
+@media (max-height: 780px) {
+  .site-with-navigation { --site-header-height: 82px; }
+}
+@media (max-height: 500px) and (orientation: landscape) {
+  .site-with-navigation { --site-header-height: 64px; }
+}
