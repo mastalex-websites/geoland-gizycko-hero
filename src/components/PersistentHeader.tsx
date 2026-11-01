@@ -7,7 +7,6 @@ export default function PersistentHeader({ navigation }: { navigation: ReactNode
   useEffect(() => {
     const header = ref.current
     const hero = document.querySelector<HTMLElement>('.current-hero')
-    const contact = document.querySelector<HTMLElement>('.contact-section')
     if (!header || !hero) return
     let frame = 0
 
@@ -15,9 +14,9 @@ export default function PersistentHeader({ navigation }: { navigation: ReactNode
       frame = 0
       const middle = header.getBoundingClientRect().height / 2
       const pastHero = hero.getBoundingClientRect().bottom <= middle
-      const onContact = !!contact && contact.getBoundingClientRect().top <= middle
-      header.dataset.tone = !onContact && (pastHero || hero.hasAttribute('data-in-lens')) ? 'dark' : 'light'
-      header.dataset.surface = onContact ? 'light' : pastHero ? 'dark' : 'hero'
+      // Keep one stable surface as contact passes behind the fixed header.
+      header.dataset.tone = pastHero || hero.hasAttribute('data-in-lens') ? 'dark' : 'light'
+      header.dataset.surface = pastHero ? 'dark' : 'hero'
     }
     const schedule = () => {
       if (!frame) frame = requestAnimationFrame(update)
