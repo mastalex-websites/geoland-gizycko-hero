@@ -21,10 +21,12 @@ const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)')
 const DRIFT_EASING = 0.09
 // Stages of the quote as shares of the scroll that follows the flight: hero fade, growth from the lens, move to the left.
 const QUOTE_FADE_END = 0.1
-const QUOTE_GROW_START = 0.06
+const QUOTE_GROW_START = 0.16
 const QUOTE_GROW_END = 0.62
 const QUOTE_MOVE_END = 0.9
 const QUOTE_MIN_SCALE = 0.008
+// First frame that is fully black inside the lens; the quote never shows over an earlier one.
+const QUOTE_LENS_FRAME = 232
 // Blocks below the opening: travel per viewport height, and the distances from centre where they start and finish fading.
 const BLOCK_DRIFT = 0.12
 const BLOCK_FADE_START = 0.35
@@ -132,11 +134,17 @@ const smoothstep = (value: number) => {
   return position * position * (3 - 2 * position)
 }
 
+// Reads the frame actually drawn, which can trail the scroll position while frames load.
+function isInsideLens(stage: HTMLElement) {
+  const canvas = stage.closest('.hero-shell')?.querySelector('canvas')
+  return Number(canvas?.dataset.frame) >= QUOTE_LENS_FRAME
+}
+
 // 0 until the flight ends, 1 when the hero is about to unpin.
 function getQuoteProgress(stage: HTMLElement) {
   const shell = stage.closest('main')
   const flight = shell?.querySelector<HTMLElement>('.flight-track')
-  if (!shell || !flight) return 0
+  if (!shell || !flight || !isInsideLens(stage)) return 0
   const flown = -shell.getBoundingClientRect().top - (flight.offsetHeight - window.innerHeight)
   return clamp(flown / Math.max(1, shell.offsetHeight - flight.offsetHeight), 0, 1)
 }
@@ -152,17 +160,16 @@ function renderQuote(stage: HTMLElement, progress: number) {
   hero.toggleAttribute('data-hero-faded', heroFade === 0)
   backdrop.style.opacity = smoothstep((progress - QUOTE_GROW_END) / (1 - QUOTE_GROW_END)).toFixed(3)
 
-  if (reducedMotion.matches) {
-    title.style.opacity = smoothstep((progress - QUOTE_FADE_END) / QUOTE_FADE_END).toFixed(3)
-    return
-  }
+  // Easing must not carry the quote back over the flight when scrolling up quickly.
+  const visibility = isInsideLens(stage) ? clamp((progress - QUOTE_GROW_START) / QUOTE_FADE_END, 0, 1) : 0
+  title.style.opacity = visibility.toFixed(3)
+  if (reducedMotion.matches) return
 
   // The zoom is exponential so the text seems to approach at a constant speed.
   const grow = smoothstep((progress - QUOTE_GROW_START) / (QUOTE_GROW_END - QUOTE_GROW_START))
   const move = smoothstep((progress - QUOTE_GROW_END) / (QUOTE_MOVE_END - QUOTE_GROW_END))
   const scale = QUOTE_MIN_SCALE ** (1 - grow)
   const offset = (stage.clientWidth / 2 - title.offsetLeft - title.offsetWidth / 2) * (1 - move)
-  title.style.opacity = clamp((progress - QUOTE_GROW_START) / QUOTE_GROW_START, 0, 1).toFixed(3)
   title.style.transform = `translate(${offset.toFixed(1)}px, 0) scale(${scale.toFixed(4)})`
   // Lines start centred on the lens and settle into left alignment.
   title.querySelectorAll<HTMLElement>('.opening-line').forEach((line) => {
