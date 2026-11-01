@@ -1,7 +1,7 @@
 .site-with-navigation { --site-header-height: 100px; }
 .persistent-header { position: fixed; inset: 0 0 auto; z-index: 60; isolation: isolate; }
-.persistent-header::before { content: ''; position: absolute; inset: 0 0 -24px; z-index: -1; pointer-events: none; background: linear-gradient(to bottom, #151515 calc(100% - 24px), transparent); opacity: 0; }
-.persistent-header[data-surface='dark']::before { opacity: 1; }
+.persistent-header::before { content: ''; position: absolute; inset: 0 0 -24px; z-index: -1; pointer-events: none; background: var(--navigation-background, #151515); mask-image: linear-gradient(to bottom, #000 calc(100% - 24px), transparent); opacity: 0; }
+.persistent-header[data-surface='page']::before { opacity: 1; }
 .persistent-header .navigation-shell { min-height: var(--site-header-height); }
 .persistent-header[data-tone='dark'] .wordmark, .persistent-header[data-tone='dark'] .nav-link { color: #fff; text-shadow: 0 1px 8px #0009; }
 .persistent-header[data-tone='dark'] .nav-link:not([aria-current]) { color: #ffffffcc; }
@@ -11,6 +11,9 @@
 .persistent-header[data-tone='dark'] .mobile-toggle { border-color: #ffffff50; background: transparent; }
 .persistent-header[data-tone='dark'] .mobile-toggle > span { background: #fff; }
 .persistent-header[data-tone='dark'] :focus-visible { outline-color: #fff; }
+.persistent-header[data-surface='page'] .nav-link:not([aria-current]) { color: var(--navigation-muted-ink); }
+.persistent-header[data-contact-transition='true'] .wordmark, .persistent-header[data-contact-transition='true'] .nav-link { transition: none; }
+.persistent-header[data-contact-transition='true'] .nav-cta { transition: transform 240ms ease, box-shadow 240ms ease; }
 .site-with-navigation .story-stage[data-pinned] .offer-layout { padding-top: max(8svh, calc(var(--site-header-height) + 24px)); }
 .site-with-navigation .story-stage[data-pinned] .partners-title { top: max(8svh, calc(var(--site-header-height) + 24px)); }
 .site-with-navigation .story-stage[data-pinned] .partners-progress { top: max(calc(8svh + 28px), calc(var(--site-header-height) + 52px)); }

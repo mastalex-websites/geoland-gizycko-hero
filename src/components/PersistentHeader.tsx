@@ -1,4 +1,5 @@
 import { useEffect, useRef, type ReactNode } from 'react'
+import { getNavigationSurface } from '../lib/navigationSurface'
 import '../styles/navigation.css'
 
 export default function PersistentHeader({ navigation }: { navigation: ReactNode }) {
@@ -7,16 +8,21 @@ export default function PersistentHeader({ navigation }: { navigation: ReactNode
   useEffect(() => {
     const header = ref.current
     const hero = document.querySelector<HTMLElement>('.current-hero')
+    const contact = document.querySelector<HTMLElement>('.contact-section')
     if (!header || !hero) return
     let frame = 0
 
     const update = () => {
       frame = 0
-      const middle = header.getBoundingClientRect().height / 2
+      const height = header.getBoundingClientRect().height
+      const middle = height / 2
       const pastHero = hero.getBoundingClientRect().bottom <= middle
-      // Keep one stable surface as contact passes behind the fixed header.
-      header.dataset.tone = pastHero || hero.hasAttribute('data-in-lens') ? 'dark' : 'light'
-      header.dataset.surface = pastHero ? 'dark' : 'hero'
+      const surface = getNavigationSurface(contact?.getBoundingClientRect().top ?? Infinity, height)
+      header.style.setProperty('--navigation-background', `rgb(${surface.background.join(', ')})`)
+      header.style.setProperty('--navigation-muted-ink', `rgb(${surface.mutedInk}, ${surface.mutedInk}, ${surface.mutedInk})`)
+      header.dataset.tone = pastHero ? surface.tone : hero.hasAttribute('data-in-lens') ? 'dark' : 'light'
+      header.dataset.surface = pastHero ? 'page' : 'hero'
+      header.dataset.contactTransition = String(pastHero && surface.transitioning)
     }
     const schedule = () => {
       if (!frame) frame = requestAnimationFrame(update)
