@@ -8,9 +8,9 @@ function LensArrival() {
     <section className="lens-arrival absolute inset-0 z-10" data-active="false" data-visible="false" inert aria-hidden="true" aria-labelledby="opening-title">
       <div className="lens-arrival-copy">
         <h2 id="opening-title" className="opening-title font-light">
-          <span className="opening-line">Najlepsi geodeci</span>
+          <span className="opening-line">„Najlepsi geodeci</span>
           {' '}
-          <span className="opening-line">w regionie</span>
+          <span className="opening-line">w regionie”</span>
         </h2>
       </div>
     </section>

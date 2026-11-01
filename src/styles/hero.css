@@ -76,7 +76,7 @@
 .current-hero .lens-arrival { --viewport-mask-y: var(--hero-mask-y, 0px); color: #e4e2d8; visibility: hidden; pointer-events: none; }
 .current-hero .lens-arrival[data-visible='true'] { visibility: visible; }
 .current-hero .lens-arrival[data-active='true'] { pointer-events: auto; }
-.current-hero .lens-arrival-copy { position: absolute; top: 0; left: 0; width: max-content; max-width: calc(100% - 64px); text-align: center; opacity: var(--arrival-opacity, 0); transform: translate3d(var(--arrival-x, 50vw), var(--arrival-y, 50svh), 0) scale(var(--arrival-scale, 0.05)) translate(-50%, -50%); transform-origin: 0 0; will-change: transform, opacity; }
+.current-hero .lens-arrival-copy { position: absolute; top: 0; left: 0; width: max-content; max-width: calc(100% - 64px); text-align: left; opacity: var(--arrival-opacity, 0); transform: translate(var(--arrival-x, 50vw), var(--arrival-y, 50svh)) scale(var(--arrival-scale, 0.05)) translate(-50%, -50%); transform-origin: 0 0; }
 .current-hero .sequence-contrast {
   background: linear-gradient(to bottom, #0000, #0008 24%, #0009 65%, #0005);
   opacity: var(--mist-opacity, 1);
@@ -155,10 +155,9 @@
 .current-hero .button-dark:hover, .current-hero .button-dark:active { transform: none; }
 .current-hero .story-panel { transform: none; will-change: opacity; }
 .current-hero .sequence-scene { transform: none; will-change: auto; }
-.current-hero .lens-arrival-copy { will-change: auto; }
 }
 .current-hero .hero-shell > header { position: absolute; inset: 0 0 auto; z-index: 30; }
 .current-hero .opening-title { opacity: 1; }
-.current-hero .opening-line { width: auto; }
+.current-hero .opening-line { width: fit-content; }
 .current-hero[data-in-lens] .mobile-toggle { border-color: #ffffff50; background: transparent; }
 .current-hero[data-in-lens] .mobile-toggle > span { background: #fff; }

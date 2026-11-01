@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react'
 import type { RefObject } from 'react'
 import { getStoryState } from '../lib/heroStoryProgress'
-import { getLensHandoff, getLensProjection, VIDEO_SCROLL_SCREENS } from '../lib/lensHandoff'
+import { getLensHandoff, getQuoteMotion, VIDEO_SCROLL_SCREENS } from '../lib/lensHandoff'
 
 const FRAME_COUNT = 240
 const CACHE_LIMIT = 24
@@ -32,7 +32,6 @@ export default function HeroSequence({ containerRef }: { containerRef: RefObject
     let viewportHeight = 0
     let sceneTravel = 0
     let displayedFrame = 0
-    let arrivalWidth = 1
     let previousTick = 0
     const cache = new Map<number, HTMLImageElement>()
     const loading = new Map<number, HTMLImageElement>()
@@ -41,11 +40,13 @@ export default function HeroSequence({ containerRef }: { containerRef: RefObject
     const storyPanels = [...container.querySelectorAll<HTMLElement>('[data-story-panel]')]
     const arrival = container.querySelector<HTMLElement>('.lens-arrival')
     const arrivalCopy = container.querySelector<HTMLElement>('.lens-arrival-copy')
+    const arrivalLines = [...container.querySelectorAll<HTMLElement>('.lens-arrival .opening-line')]
     const hero = container.querySelector<HTMLElement>('.hero-shell')
 
     const compose = (frame: number) => {
       const motion = getLensHandoff(sceneTravel, frame)
-      const projection = getLensProjection(frame, viewportWidth, viewportHeight, arrivalWidth, motion.cameraScale, motion.phase)
+      const arrivalWidth = arrivalCopy?.offsetWidth || 1
+      const quote = getQuoteMotion(sceneTravel, viewportWidth, arrivalWidth)
       const reduced = preference.matches
       container.style.setProperty('--camera-scale', String(reduced ? 1 : motion.cameraScale))
       container.style.setProperty('--scene-opacity', String(motion.sceneOpacity))
@@ -53,9 +54,13 @@ export default function HeroSequence({ containerRef }: { containerRef: RefObject
       container.style.setProperty('--outgoing-shift', `${reduced ? 0 : motion.outgoingShift}px`)
       container.style.setProperty('--experience-description-opacity', String(reduced ? 1 : motion.descriptionOpacity))
       container.style.setProperty('--arrival-opacity', String(reduced ? Number(motion.arrivalActive) : motion.arrivalOpacity))
-      container.style.setProperty('--arrival-scale', String(reduced ? 1 : projection.scale))
-      container.style.setProperty('--arrival-x', `${reduced ? viewportWidth / 2 : projection.x}px`)
-      container.style.setProperty('--arrival-y', `${reduced ? viewportHeight / 2 : projection.y}px`)
+      container.style.setProperty('--arrival-scale', String(reduced ? 1 : quote.scale))
+      container.style.setProperty('--arrival-x', `${reduced ? quote.restX : quote.x}px`)
+      container.style.setProperty('--arrival-y', `${viewportHeight / 2}px`)
+      // Lines start centred on the lens and settle into left alignment.
+      arrivalLines.forEach((line) => {
+        line.style.transform = `translateX(${reduced ? 0 : ((arrivalWidth - line.offsetWidth) / 2) * (1 - quote.move)}px)`
+      })
       container.dataset.handoff = motion.phase.toFixed(4)
 
       const story = getStoryState(frame / (FRAME_COUNT - 1))
@@ -207,7 +212,6 @@ export default function HeroSequence({ containerRef }: { containerRef: RefObject
       const pixelRatio = Math.min(window.devicePixelRatio || 1, 2)
       viewportWidth = Math.max(1, canvas.clientWidth)
       viewportHeight = Math.max(1, canvas.clientHeight)
-      arrivalWidth = arrivalCopy?.offsetWidth || 1
       canvas.width = Math.round(viewportWidth * pixelRatio)
       canvas.height = Math.round(viewportHeight * pixelRatio)
       context.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0)

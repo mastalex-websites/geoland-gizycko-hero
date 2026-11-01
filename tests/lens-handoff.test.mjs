@@ -1,6 +1,6 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import { getLensHandoff, getLensProjection, STORY_SCROLL_SCREENS, VIDEO_SCROLL_SCREENS } from '../src/lib/lensHandoff.ts'
+import { getLensHandoff, getQuoteMotion, STORY_SCROLL_SCREENS, VIDEO_SCROLL_SCREENS } from '../src/lib/lensHandoff.ts'
 
 test('the film retains its scroll distance and the next section gets a reading pause', () => {
   assert.equal(getLensHandoff(VIDEO_SCROLL_SCREENS).videoProgress, 1)
@@ -8,34 +8,37 @@ test('the film retains its scroll distance and the next section gets a reading p
   const end = getLensHandoff(STORY_SCROLL_SCREENS)
   assert.equal(end.phase, 1)
   assert.equal(end.sceneOpacity, 0)
-  assert.equal(getLensProjection(239, 1280, 720, 740, end.cameraScale, end.phase).scale, 1)
+  assert.equal(getQuoteMotion(STORY_SCROLL_SCREENS, 1440, 740).scale, 1)
   assert.equal(end.arrivalOpacity, 1)
 })
 
-test('the camera continues forward and one readable caption survives the handoff', () => {
+test('the camera continues forward and the quote waits for the black inside of the lens', () => {
   let previousScale = 1
   for (let step = 0; step <= 1000; step += 1) {
-    const motion = getLensHandoff(step / 1000 * STORY_SCROLL_SCREENS)
+    const travel = step / 1000 * STORY_SCROLL_SCREENS
+    const motion = getLensHandoff(travel)
     assert.ok(motion.cameraScale >= previousScale)
     previousScale = motion.cameraScale
-    const visibleOpacity = motion.arrivalActive ? motion.arrivalOpacity : motion.outgoingOpacity
-    assert.ok(visibleOpacity >= 0.5)
     assert.ok(motion.sceneOpacity >= 0 && motion.sceneOpacity <= 1)
+    if (travel / VIDEO_SCROLL_SCREENS * 239 < 232) assert.equal(motion.arrivalVisible, false)
   }
 })
 
-test('the next heading is already in the distant lens and grows with the decoded film', () => {
-  const distant = getLensHandoff(2.9, 190)
-  assert.ok(distant.arrivalVisible)
-  assert.ok(distant.arrivalOpacity > 0.5)
-  assert.equal(distant.sceneOpacity, 1, 'loading a later frame must not fade the lens early')
+test('a lagging film holds the quote back, then it grows from the lens and moves left', () => {
+  const lagging = getLensHandoff(3.2, 190)
+  assert.equal(lagging.arrivalVisible, false)
+  assert.equal(lagging.arrivalOpacity, 0)
+  assert.equal(lagging.sceneOpacity, 1, 'loading a later frame must not fade the lens early')
+  assert.ok(getLensHandoff(2.59, 238).arrivalOpacity > 0)
   let previous = 0
-  for (let frame = 180; frame <= 239; frame += 1) {
-    const projection = getLensProjection(frame, 1280, 720, 740, 1, 0)
-    assert.ok(projection.scale >= previous)
-    assert.ok(Math.abs(projection.x - 640) <= 2)
-    previous = projection.scale
+  for (let travel = 2.54; travel <= 3.54; travel += 0.01) {
+    const quote = getQuoteMotion(travel, 1440, 740)
+    assert.ok(quote.scale >= previous)
+    assert.equal(quote.x, 720, 'the zoom stays on the axis of the lens')
+    previous = quote.scale
   }
-  assert.ok(getLensProjection(190, 1280, 720, 740, 1, 0).scale < 0.2)
-  assert.ok(getLensProjection(220, 1280, 720, 740, 1, 0).scale > 0.5)
+  assert.ok(getQuoteMotion(2.54, 1440, 740).scale < 0.01)
+  const settled = getQuoteMotion(4.04, 1440, 740)
+  assert.equal(settled.x, 112 + 370, 'the quote ends on the left edge of the page')
+  assert.equal(settled.move, 1)
 })
