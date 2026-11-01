@@ -34,7 +34,7 @@ a { text-decoration: none; }
 ::selection { background: #dedfd4; color: #000; }
 :focus-visible { outline: 2px solid #000; outline-offset: 6px; }
 
-.story-shell { height: 600vh; height: 600svh; --scroll-progress: 0; }
+.story-shell { height: 790vh; height: 790svh; --scroll-progress: 0; }
 .flight-track { height: 360vh; height: 360svh; }
 .hero-shell {
   height: 100vh;

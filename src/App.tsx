@@ -20,10 +20,10 @@ const offers = [
 const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)')
 const DRIFT_EASING = 0.09
 // Stages of the quote as shares of the scroll that follows the flight: hero fade, growth from the lens, move to the left.
-const QUOTE_FADE_END = 0.1
-const QUOTE_GROW_START = 0.16
-const QUOTE_GROW_END = 0.62
-const QUOTE_MOVE_END = 0.9
+const QUOTE_FADE_END = 0.056
+const QUOTE_GROW_START = 0.09
+const QUOTE_GROW_END = 0.79
+const QUOTE_MOVE_END = 0.945
 const QUOTE_MIN_SCALE = 0.008
 // First frame that is fully black inside the lens; the quote never shows over an earlier one.
 const QUOTE_LENS_FRAME = 232
@@ -165,10 +165,10 @@ function renderQuote(stage: HTMLElement, progress: number) {
   title.style.opacity = visibility.toFixed(3)
   if (reducedMotion.matches) return
 
-  // The zoom is exponential so the text seems to approach at a constant speed.
+  // The size changes evenly with the scroll, so the text never rushes at the end of the zoom.
   const grow = smoothstep((progress - QUOTE_GROW_START) / (QUOTE_GROW_END - QUOTE_GROW_START))
   const move = smoothstep((progress - QUOTE_GROW_END) / (QUOTE_MOVE_END - QUOTE_GROW_END))
-  const scale = QUOTE_MIN_SCALE ** (1 - grow)
+  const scale = QUOTE_MIN_SCALE + (1 - QUOTE_MIN_SCALE) * grow
   const offset = (stage.clientWidth / 2 - title.offsetLeft - title.offsetWidth / 2) * (1 - move)
   title.style.transform = `translate(${offset.toFixed(1)}px, 0) scale(${scale.toFixed(4)})`
   // Lines start centred on the lens and settle into left alignment.
