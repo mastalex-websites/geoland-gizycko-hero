@@ -226,12 +226,11 @@ function WordReveal({ text }: { text: string }) {
   ))
 }
 
-function AboutBlock({ number, title, className = '', drift, children }: { number: string; title: string; className?: string; drift: boolean; children: ReactNode }) {
+function AboutBlock({ title, className = '', drift, children }: { title: string; className?: string; drift: boolean; children: ReactNode }) {
   const ref = useEasedScroll<HTMLDivElement>(getBlockDrift, renderBlockDrift, { enabled: drift })
 
   return (
     <div ref={ref} className={`about-block ${className}`}>
-      <span className="about-number font-mono" aria-hidden="true">{number}</span>
       <div>
         <h3 className="about-heading font-light">{title}</h3>
         {children}
@@ -244,12 +243,12 @@ function AboutSection({ drift }: { drift: boolean }) {
   return (
     <section className="about-section" aria-label="O firmie">
       <div className="about-grid mx-auto w-full max-w-7xl px-8">
-        <AboutBlock number="01." title="Kompleksowe usługi" drift={drift}>
+        <AboutBlock title="Kompleksowe usługi" drift={drift}>
           <p className="about-text font-mono">
             <WordReveal text="Geoland-Giżycko jest małą firmą geodezyjną oferującą kompleksowe usługi z zakresu pomiarów powykonawczych, map do celów projektowych i podziałów nieruchomości. Wiedza oraz wieloletnie doświadczenie zdobyte podczas realizacji zleceń geodezyjnych na terenie całego kraju, pozwalają nam na wykonanie usług na najwyższym poziomie." />
           </p>
         </AboutBlock>
-        <AboutBlock number="02." title="Sprzęt i oprogramowanie" className="about-block-offset" drift={drift}>
+        <AboutBlock title="Sprzęt i oprogramowanie" className="about-block-offset" drift={drift}>
           <p className="about-text font-mono">
             <WordReveal text="Dysponujemy profesjonalnym sprzętem pomiarowym oraz najnowszym oprogramowaniem geo-informatycznym co pozwala nam na wykonywanie usług na najwyższym poziomie. Gwarantujemy naszym klientom satysfakcję oraz zadowolenie z powierzonych nam prac." />
           </p>
@@ -262,11 +261,9 @@ function AboutSection({ drift }: { drift: boolean }) {
 
 function OfferRow({ index, name, text, drift }: { index: number; name: string; text: string; drift: boolean }) {
   const ref = useEasedScroll<HTMLLIElement>(getBlockDrift, renderBlockDrift, { enabled: drift })
-  const number = `${String(index + 1).padStart(2, '0')}.`
 
   return (
     <li ref={ref} className="offer-row" style={{ '--card': index } as CSSProperties}>
-      <span className="about-number font-mono" aria-hidden="true">{number}</span>
       <h3 className="offer-name font-light">{name}</h3>
       <p className="offer-text font-mono">{text}</p>
     </li>
