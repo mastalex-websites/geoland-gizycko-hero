@@ -1,0 +1,164 @@
+/* Current hero only: preserve the published sections below it. */
+.current-hero { --header-height: 100px; }
+.current-hero { --scroll-progress: 0; }
+.current-hero .hero-shell {
+  background: #151515;
+  height: 100vh;
+  height: 100svh;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  padding-top: var(--header-height);
+}
+.current-hero .navigation-shell { min-height: 100px; }
+.current-hero .wordmark { flex-shrink: 0; }
+.current-hero .logo-point { margin-left: 1px; }
+.current-hero .nav-link { position: relative; }
+.current-hero .nav-link[aria-current='page']::after {
+  content: '';
+  position: absolute;
+  height: 3px;
+  width: 3px;
+  border-radius: 100%;
+  background: #000;
+  left: calc(50% - 1.5px);
+  bottom: -9px;
+}
+.current-hero .button-dark {
+  transition: transform 240ms ease, background-color 240ms ease, box-shadow 240ms ease;
+}
+.current-hero .button-dark:hover {
+  transform: scale(1.03);
+  background: #202020;
+  box-shadow: 0 8px 24px #00000012;
+}
+.current-hero .button-dark:active { transform: scale(0.99); }
+.current-hero .hero-content {
+  flex: 1 1 auto;
+  min-height: 0;
+  opacity: var(--outgoing-opacity, 1);
+  overflow: clip;
+}
+.current-hero .story-panel {
+  --panel-opacity: 0;
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 16px 24px clamp(20px, 5svh, 60px);
+  text-align: center;
+  opacity: var(--panel-opacity);
+  transform: translateY(calc((1 - var(--panel-opacity)) * 16px - var(--outgoing-shift, 0px)));
+  will-change: opacity, transform;
+  pointer-events: none;
+}
+.current-hero .story-panel[data-story-panel='0'] { --panel-opacity: 1; }
+.current-hero .story-panel[data-active='false'] { visibility: hidden; }
+.current-hero .story-panel[data-active='true'] { opacity: calc(0.6 + var(--panel-opacity) * 0.4); pointer-events: auto; }
+.current-hero .story-panel-side {
+  align-items: flex-start;
+  text-align: left;
+  padding-left: max(32px, calc((100vw - 1216px) / 2));
+  padding-top: clamp(48px, 12svh, 120px);
+}
+.current-hero .story-heading { font-size: clamp(50px, 5.8vw, 80px); line-height: 1.02; letter-spacing: -1.6px; text-shadow: 0 2px 20px #0009, 0 1px 3px #0008; }
+.current-hero .story-panel-side .hero-description { max-width: 460px; }
+.current-hero .hero-title { width: 100%; text-shadow: 0 2px 20px #0009, 0 1px 3px #0008; }
+.current-hero .hero-description { max-width: 630px; text-wrap: pretty; font-weight: 450; }
+.current-hero .hero-description { text-shadow: 0 1px 4px #000e, 0 2px 12px #0009; }
+.current-hero .story-panel[data-story-panel='2'] .hero-description { opacity: var(--experience-description-opacity, 1); }
+.current-hero .sequence-canvas {
+  background: url('/media/geoland-poster.jpg') center / cover no-repeat;
+}
+.current-hero .sequence-scene { transform: scale(var(--camera-scale, 1)); transform-origin: 50% 50%; opacity: var(--scene-opacity, 1); will-change: transform, opacity; }
+.current-hero .lens-arrival { --viewport-mask-y: var(--hero-mask-y, 0px); color: #e4e2d8; visibility: hidden; pointer-events: none; }
+.current-hero .lens-arrival[data-visible='true'] { visibility: visible; }
+.current-hero .lens-arrival[data-active='true'] { pointer-events: auto; }
+.current-hero .lens-arrival-copy { position: absolute; top: 0; left: 0; width: max-content; max-width: calc(100% - 64px); text-align: center; opacity: var(--arrival-opacity, 0); transform: translate3d(var(--arrival-x, 50vw), var(--arrival-y, 50svh), 0) scale(var(--arrival-scale, 0.05)) translate(-50%, -50%); transform-origin: 0 0; will-change: transform, opacity; }
+.current-hero .sequence-contrast {
+  background: linear-gradient(to bottom, #0000, #0008 24%, #0009 65%, #0005);
+  opacity: var(--mist-opacity, 1);
+}
+.current-hero .sequence-wash {
+  bottom: auto;
+  height: 176px;
+  background: linear-gradient(to bottom, #fff 0%, #fffffff5 38%, #ffffff00 76%);
+  opacity: var(--mist-opacity, 1);
+}
+.current-hero .lens-arrival {
+  mask-image: linear-gradient(to bottom, transparent var(--header-height), #000 calc(var(--header-height) + 24px));
+  mask-size: 100% var(--viewport-height);
+  mask-position: 0 var(--viewport-mask-y);
+  mask-repeat: no-repeat;
+}
+.current-hero .story-progress { transform: scaleX(var(--scroll-progress)); opacity: var(--scene-opacity, 1); }
+.current-hero .opening-title { margin: 0; font-size: clamp(40px, 8vw, 116px); line-height: 1.02; letter-spacing: -0.03em; }
+.current-hero .opening-line { display: block; white-space: nowrap; }
+.current-hero .mobile-toggle { display: none; }
+.current-hero .skip-link { position: fixed; z-index: 100; top: 12px; left: 12px; transform: translateY(-160%); padding: 12px 20px; background: #000; color: #fff; border-radius: 30px; }
+.current-hero .skip-link:focus { transform: translateY(0); }
+@media (min-width: 768px) {
+.current-hero .hero-title { font-size: clamp(64px, min(7vw, 10.5svh), 100px); }
+.current-hero .hero-description { font-size: clamp(14px, 1.9svh, 18px); }
+}
+@media (max-width: 1023px) {
+.current-hero .desktop-navigation { gap: 24px; }
+.current-hero .nav-cta { gap: 12px; padding-inline: 20px; }
+.current-hero .wordmark { gap: 5px; }
+.current-hero .wordmark > span:first-child { font-size: 32px; }
+.current-hero .wordmark > span:last-child { font-size: 8px; }
+}
+@media (max-width: 767px) {
+.current-hero { --header-height: 88px; }
+.current-hero .navigation-shell { min-height: 88px; padding: 22px 24px; }
+.current-hero .desktop-navigation, .current-hero .nav-cta { display: none; }
+.current-hero .mobile-toggle { display: flex; }
+.current-hero .story-panel { padding-top: 16px; padding-bottom: 80px; }
+.current-hero .story-panel-side { padding-top: 56px; padding-left: 24px; }
+.current-hero .hero-title { font-size: clamp(48px, 7.8vw, 72px); letter-spacing: -1.7px; line-height: 1.02; }
+.current-hero .hero-description { max-width: 520px; }
+}
+@media (max-width: 479px) {
+.current-hero .lens-arrival-copy { max-width: calc(100% - 40px); }
+.current-hero .lens-arrival .opening-title { font-size: clamp(32px, 10vw, 40px); }
+.current-hero .story-panel { padding-inline: 22px; padding-top: 14px; padding-bottom: 60px; }
+.current-hero .story-panel-side { padding-top: 48px; }
+.current-hero .hero-title { max-width: 390px; font-size: clamp(48px, 11.6vw, 55px); line-height: 1.02; }
+.current-hero .headline-break { display: none; }
+.current-hero .hero-description { font-size: 14px; line-height: 1.8; margin-top: 24px; }
+.current-hero .story-heading { font-size: 46px; }
+}
+@media (max-height: 780px) {
+.current-hero { --header-height: 82px; }
+.current-hero .navigation-shell { min-height: 82px; padding-block: 19px; }
+.current-hero .story-panel { padding-top: 12px; padding-bottom: 50px; }
+.current-hero .story-panel-side { padding-top: 48px; }
+.current-hero .hero-description { margin-top: 24px; }
+}
+@media (max-height: 700px) and (max-width: 479px) {
+.current-hero .story-panel { padding-top: 10px; padding-bottom: 32px; }
+.current-hero .story-panel-side { padding-top: 32px; }
+.current-hero .hero-title { font-size: 44px; }
+.current-hero .hero-description { font-size: 12px; margin-top: 20px; }
+}
+@media (max-height: 500px) and (orientation: landscape) {
+.current-hero { --header-height: 64px; }
+.current-hero .navigation-shell { min-height: 64px; padding-block: 12px; }
+.current-hero .story-panel { padding-top: 6px; padding-bottom: 10px; }
+.current-hero .story-panel-side { padding-top: 16px; }
+.current-hero .hero-title, .current-hero .story-heading { font-size: 44px; }
+.current-hero .hero-description { margin-top: 12px; font-size: 12px; max-width: 550px; }
+}
+@media (prefers-reduced-motion: reduce) {
+.current-hero .button-dark:hover, .current-hero .button-dark:active { transform: none; }
+.current-hero .story-panel { transform: none; will-change: opacity; }
+.current-hero .sequence-scene { transform: none; will-change: auto; }
+.current-hero .lens-arrival-copy { will-change: auto; }
+}
+.current-hero .hero-shell > header { position: absolute; inset: 0 0 auto; z-index: 30; }
+.current-hero .opening-title { opacity: 1; }
+.current-hero .opening-line { width: auto; }
+.current-hero[data-in-lens] .mobile-toggle { border-color: #ffffff50; background: transparent; }
+.current-hero[data-in-lens] .mobile-toggle > span { background: #fff; }
