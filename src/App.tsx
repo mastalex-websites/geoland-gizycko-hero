@@ -19,11 +19,13 @@ const offers = [
 
 const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)')
 const DRIFT_EASING = 0.09
-// Stages of the quote as shares of the scroll that follows the flight: hero fade, growth from the lens, move to the left.
-const QUOTE_FADE_END = 0.056
-const QUOTE_GROW_START = 0.09
-const QUOTE_GROW_END = 0.79
-const QUOTE_MOVE_END = 0.945
+// The quote's scroll starts this share of the flight before its end, so the hero fades and the zoom starts on the last frames.
+const QUOTE_FLIGHT_LEAD = 0.085
+// Stages of the quote as shares of its scroll: hero fade, growth from the lens, move to the left.
+const QUOTE_FADE_END = 0.08
+const QUOTE_GROW_START = 0.091
+const QUOTE_GROW_END = 0.659
+const QUOTE_MOVE_END = 0.943
 const QUOTE_MIN_SCALE = 0.008
 // First frame that is fully black inside the lens; the quote never shows over an earlier one.
 const QUOTE_LENS_FRAME = 232
@@ -140,13 +142,15 @@ function isInsideLens(stage: HTMLElement) {
   return Number(canvas?.dataset.frame) >= QUOTE_LENS_FRAME
 }
 
-// 0 until the flight ends, 1 when the hero is about to unpin.
+// 0 until the last frames of the flight, 1 when the hero is about to unpin.
 function getQuoteProgress(stage: HTMLElement) {
   const shell = stage.closest('main')
   const flight = shell?.querySelector<HTMLElement>('.flight-track')
-  if (!shell || !flight || !isInsideLens(stage)) return 0
-  const flown = -shell.getBoundingClientRect().top - (flight.offsetHeight - window.innerHeight)
-  return clamp(flown / Math.max(1, shell.offsetHeight - flight.offsetHeight), 0, 1)
+  if (!shell || !flight) return 0
+  const flightDistance = flight.offsetHeight - window.innerHeight
+  const lead = flightDistance * QUOTE_FLIGHT_LEAD
+  const scrolled = -shell.getBoundingClientRect().top - flightDistance + lead
+  return clamp(scrolled / Math.max(1, shell.offsetHeight - flight.offsetHeight + lead), 0, 1)
 }
 
 function renderQuote(stage: HTMLElement, progress: number) {
