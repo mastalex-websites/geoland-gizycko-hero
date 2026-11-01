@@ -17,6 +17,12 @@ const offers = [
   { name: 'PODZIAŁY NIERUCHOMOŚCI', text: 'Wydzielenie części działki jako odrębnej nieruchomości lub do włączenia w inną działkę, np. na sprzedaż, pod budowę lub uprawę.' },
 ]
 
+const partners = [
+  { name: 'Geo-Wektor Paweł Kobiałka', href: 'http://www.geo-wektor.com' },
+  { name: 'Katalog Firm Firmowy.com.pl', href: 'http://www.firmowy.com.pl' },
+  { name: 'Biuro Nieruchomości NOVADOM s.c. Giżycko', href: 'http://www.novadom.mazury.pl/' },
+]
+
 const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)')
 const DRIFT_EASING = 0.09
 // The quote's scroll starts this share of the flight before its end, so the hero fades and the zoom starts on the last frames.
@@ -189,6 +195,12 @@ function getBlockDrift(block: HTMLElement, drift: number) {
   return clamp((restingTop + height / 2 - viewport / 2) / viewport, -1, 1)
 }
 
+// The footer cannot reach the viewport centre, so it settles at the end of the page instead.
+function getFooterDrift() {
+  const remaining = document.documentElement.scrollHeight - window.innerHeight - window.scrollY
+  return clamp(remaining / window.innerHeight, 0, 1)
+}
+
 function renderBlockDrift(block: HTMLElement, drift: number) {
   block.style.transform = `translate3d(0, ${(drift * window.innerHeight * BLOCK_DRIFT).toFixed(1)}px, 0)`
   block.style.opacity = clamp((BLOCK_FADE_END - Math.abs(drift)) / (BLOCK_FADE_END - BLOCK_FADE_START), 0, 1).toFixed(3)
@@ -272,6 +284,53 @@ function OfferSection() {
   )
 }
 
+function PartnersSection() {
+  const ref = useEasedScroll<HTMLDivElement>(getBlockDrift, renderBlockDrift)
+
+  return (
+    <section className="partners-section" aria-labelledby="partners-title">
+      <div ref={ref} className="partners-block mx-auto w-full max-w-7xl px-8">
+        <h2 id="partners-title" className="partners-title font-mono">Współpracujemy</h2>
+        <ul className="partners-list">
+          {partners.map((partner) => (
+            <li key={partner.name} className="partners-item">
+              <a href={partner.href} target="_blank" rel="noreferrer" className="partners-link dark-link font-light">{partner.name}</a>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+  )
+}
+
+function ContactSection() {
+  const ref = useEasedScroll<HTMLDivElement>(getFooterDrift, renderBlockDrift)
+
+  return (
+    <footer className="contact-section" aria-labelledby="contact-title">
+      <div ref={ref} className="contact-block mx-auto w-full max-w-7xl px-8">
+        <h2 id="contact-title" className="offer-title font-light">Kontakt</h2>
+        <div className="contact-grid">
+          <div>
+            <p className="contact-name font-light">GEOLAND Giżycko Usługi Geodezyjne</p>
+            <p className="contact-text font-mono">Geodeta Uprawniony inż. Marcin Stemplewski</p>
+          </div>
+          <div className="contact-details font-mono">
+            <p className="contact-text">ul. Suwalska 30<br />11-500 Giżycko</p>
+            <p className="contact-text"><a href="tel:+48606803423" className="dark-link">tel. 606-803-423</a></p>
+            <p className="contact-text">
+              <a href="http://www.geoland-gizycko.com" className="dark-link">www.geoland-gizycko.com</a>
+              <br />
+              e-mail: <a href="mailto:marcinstemplewski@wp.pl" className="dark-link">marcinstemplewski@wp.pl</a>
+            </p>
+            <p className="contact-text">NIP: 845-164-89-83<br />REGON: 281351664</p>
+          </div>
+        </div>
+      </div>
+    </footer>
+  )
+}
+
 export default function App() {
   const storyRef = useRef<HTMLElement>(null)
   const flightRef = useRef<HTMLDivElement>(null)
@@ -349,6 +408,8 @@ export default function App() {
     </main>
     <AboutSection />
     <OfferSection />
+    <PartnersSection />
+    <ContactSection />
     </>
   )
 }

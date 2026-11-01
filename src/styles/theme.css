@@ -152,6 +152,21 @@ a { text-decoration: none; }
 .offer-row:last-child { border-bottom: 1px solid #424242; }
 .offer-name { margin: 0; font-size: clamp(22px, 2.6vw, 36px); line-height: 1.15; letter-spacing: -0.02em; }
 .offer-text { margin: 0; font-size: 14px; line-height: 1.65; }
+.partners-section { padding-bottom: clamp(120px, 16vw, 240px); background: #151515; color: #e4e2d8; }
+.partners-block { will-change: transform, opacity; }
+.partners-title { margin: 0 0 24px; font-size: 10.5px; font-weight: 400; color: #9b9b9b; }
+.partners-list { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); margin: 0; padding: 0; list-style: none; border-block: 1px solid #424242; }
+.partners-item + .partners-item { border-left: 1px solid #424242; }
+.partners-link { display: block; height: 100%; padding: clamp(28px, 3vw, 44px) 24px; font-size: clamp(20px, 2vw, 28px); line-height: 1.2; letter-spacing: -0.02em; }
+.dark-link { transition: opacity 240ms ease; }
+.dark-link:hover { opacity: 0.6; }
+.dark-link:focus-visible { outline-color: #e4e2d8; }
+.contact-section { overflow: clip; padding-bottom: clamp(64px, 8vw, 112px); background: #151515; color: #e4e2d8; }
+.contact-block { will-change: transform, opacity; }
+.contact-grid { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); gap: 48px 24px; padding-top: clamp(28px, 3vw, 44px); border-top: 1px solid #424242; }
+.contact-name { margin: 0 0 16px; font-size: clamp(22px, 2.6vw, 36px); line-height: 1.15; letter-spacing: -0.02em; }
+.contact-details { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 32px 24px; }
+.contact-text { margin: 0; font-size: 14px; line-height: 1.65; overflow-wrap: anywhere; }
 .mobile-toggle { display: none; }
 .skip-link { position: fixed; z-index: 100; top: 12px; left: 12px; transform: translateY(-160%); padding: 12px 20px; background: #000; color: #fff; border-radius: 30px; }
 .skip-link:focus { transform: translateY(0); }
@@ -173,6 +188,10 @@ a { text-decoration: none; }
   .about-block-offset { margin-left: 0; }
   .offer-row { grid-template-columns: 32px minmax(0, 1fr); gap: 16px 12px; }
   .offer-text { grid-column: 2; }
+  .partners-list { grid-template-columns: minmax(0, 1fr); }
+  .partners-item + .partners-item { border-left: 0; border-top: 1px solid #424242; }
+  .partners-link { padding-inline: 0; }
+  .contact-grid, .contact-details { grid-template-columns: minmax(0, 1fr); }
   .navigation-shell { min-height: 88px; padding: 22px 24px; }
   .desktop-navigation, .nav-cta { display: none; }
   .mobile-toggle { display: flex; }
